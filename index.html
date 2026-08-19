@@ -74,6 +74,12 @@ button,input,select,textarea{font-family:inherit;font-size:inherit;color:inherit
 .verdict.ok{background:var(--ok-soft);color:#0E4F36}
 .verdict.warn{background:var(--warn-soft);color:#6B4604}
 .verdict.bad{background:var(--bad-soft);color:#8C2117}
+.btn-ext{
+  appearance:none;background:none;border:1px solid #3A434D;color:#D6DDE3;border-radius:2px;
+  padding:6px 12px;cursor:pointer;text-decoration:none;white-space:nowrap;
+  font-family:var(--cond);font-weight:600;font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;
+}
+.btn-ext:hover{border-color:var(--accent-2);color:#fff}
 
 /* ---------- onglets ---------- */
 .tabs{background:var(--surface);border-bottom:1px solid var(--line);position:sticky;top:53px;z-index:35}
@@ -401,12 +407,76 @@ input:disabled::placeholder{color:var(--ink-3);font-style:italic}
 .print-only{display:none}
 
 /* ---------- capture PDF (envoi au support technique) ----------
-   html2canvas ignore @media print (il ne capture que la mise en page écran).
-   Pour que le PDF joint au mail soit identique à l'aperçu du bouton
-   « Imprimer / PDF », le script recopie au chargement les règles de
-   @media print ci-dessus sous un sélecteur .pdf-print (voir
-   construirePdfPrintShim() plus bas) : une seule source de vérité pour la
-   mise en page imprimée, réutilisée pour les deux sorties. */
+   html2canvas ignore @media print (il ne capture que la mise en page écran) :
+   on ne peut donc pas se contenter de forcer la présence de la classe
+   .pdf-print et compter sur les règles @media print ci-dessus. Les mêmes
+   règles sont donc dupliquées ici, en dur, sous le sélecteur .pdf-print,
+   plutôt que reconstruites au moment de l'envoi : recopier du texte CSS
+   depuis le CSSOM (cssText) à l'exécution s'est révélé peu fiable sur
+   certains navigateurs mobiles (échec de l'envoi avec « Error parsing CSS
+   component value, unexpected EOF »). Toute modification du bloc
+   @media print ci-dessus doit être répercutée ici. */
+.pdf-print .f input.miss, .pdf-print .f select.miss, .pdf-print .f textarea.miss, .pdf-print .tbl input.miss{border-color:var(--ink-3) !important;}
+.pdf-print .topbar, .pdf-print .tabs, .pdf-print .footbar, .pdf-print .no-print{display:none !important}
+.pdf-print body{background:#fff;font-size:9.5px;line-height:1.2}
+.pdf-print main{padding:0;max-width:none}
+.pdf-print section[role="tabpanel"].hidden{display:block !important}
+.pdf-print .print-only{display:block !important}
+.pdf-print .card{break-inside:avoid;border-color:#9AA2AA;margin-bottom:4px}
+.pdf-print .card > h2{padding:3px 7px;font-size:10px;letter-spacing:.08em}
+.pdf-print .card > h2 .hint{font-size:8px}
+.pdf-print .card-body{padding:4px 7px}
+.pdf-print .grid{gap:2px 9px}
+.pdf-print .f{gap:1px}
+.pdf-print .f > label, .pdf-print .grid > .f > label{min-height:0;font-size:8px;letter-spacing:.03em}
+.pdf-print .f input:not([type=checkbox]), .pdf-print .f select, .pdf-print .spec{height:15px;font-size:9px}
+.pdf-print .f input, .pdf-print .f select{padding:0 4px}
+.pdf-print .f input[type=number], .pdf-print .f input.num{font-size:9px}
+.pdf-print .f textarea{min-height:26px;font-size:9px;padding:2px 4px}
+.pdf-print .f .msg{font-size:7.5px;line-height:1.15;min-height:0}
+.pdf-print .spec{padding:0 5px;font-size:9px}
+.pdf-print .spec .tag{font-size:7.5px}
+.pdf-print .checks{break-inside:avoid}
+.pdf-print .chk{padding:1px 6px;gap:6px}
+.pdf-print .chk input{width:11px;height:11px}
+.pdf-print .chk input:checked::after{left:3px;top:1px;width:3px;height:5px;border-width:1.5px}
+.pdf-print .chk .state{font-size:8px}
+.pdf-print .sect{margin:4px 0 3px;padding-bottom:1px;font-size:8px}
+.pdf-print .group{margin-bottom:6px}
+.pdf-print .ghead{margin-bottom:4px}
+.pdf-print .ghead h3{font-size:11px}
+.pdf-print .mrow{margin-bottom:4px;break-inside:avoid}
+.pdf-print .mhead{padding:2px 6px;gap:8px}
+.pdf-print .mhead .t{font-size:11px}
+.pdf-print .mhead .cool, .pdf-print .mhead .st{font-size:8px;padding:1px 5px}
+.pdf-print .mhead button.x{display:none}
+.pdf-print .mbody{padding:4px}
+.pdf-print .common{margin-bottom:4px;break-inside:avoid}
+.pdf-print .common > h4{padding:3px 7px;font-size:9px}
+.pdf-print .common-body{padding:4px}
+.pdf-print .common-body .tbl{margin-top:4px}
+.pdf-print .common-body .tbl input{padding:1px 4px;width:70px;font-size:9px}
+.pdf-print .gauge{margin-bottom:5px}
+.pdf-print .gauge-top{margin-bottom:2px;gap:7px}
+.pdf-print .gauge-top .lbl{font-size:9px}
+.pdf-print .gauge-top .val{font-size:14px}
+.pdf-print .gauge-top .val.none{font-size:11px}
+.pdf-print .scale{height:12px}
+.pdf-print .scale-lbl{font-size:7.5px}
+.pdf-print .tbl{font-size:8.5px}
+.pdf-print .tbl th, .pdf-print .tbl td{padding:2px 4px}
+.pdf-print .tbl th{white-space:normal}
+.pdf-print .tbl th .u2{font-size:7.5px}
+.pdf-print .tblwrap{overflow:visible}
+.pdf-print .finding{padding:3px 7px;gap:7px}
+.pdf-print .finding .sev{width:46px;font-size:8px}
+.pdf-print .finding .txt .where{font-size:8px}
+.pdf-print .empty-state{padding:8px}
+.pdf-print .empty-state .big{font-size:11px}
+.pdf-print .note{display:none}
+.pdf-print #addMachine{display:none !important}
+.pdf-print .scale, .pdf-print .scale .fill, .pdf-print .scale .zone, .pdf-print .scale .limit, .pdf-print .spec, .pdf-print .card > h2, .pdf-print .mhead, .pdf-print .common > h4, .pdf-print .chk input:checked, .pdf-print .finding .sev, .pdf-print .verdict{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+
 .mailbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .mailmsg{font-family:var(--cond);font-size:12px;letter-spacing:.03em;color:var(--ink-2)}
 .mailmsg.ok{color:var(--ok)}
@@ -473,6 +543,7 @@ input:disabled::placeholder{color:var(--ink-3);font-style:italic}
     <div class="spacer"></div>
     <div class="chip-client" id="chipClient">Aucun chantier ouvert</div>
     <div class="verdict ok" id="verdict"><span class="dot"></span><span id="verdictTxt">À compléter</span></div>
+    <a class="btn-ext no-print" href="https://pole-expert-86f3c.web.app/" target="_blank" rel="noopener noreferrer">Pôle Expert</a>
   </div>
 </header>
 
@@ -696,38 +767,9 @@ const MAIL_CONFIG = {
   dossier: ''
 };
 
-/* recopie les règles de @media print sous .pdf-print, pour que html2canvas
-   (qui ne sait lire que la mise en page écran) rende la même chose que
-   l'impression : une passe unique, mémorisée dans #pdfPrintShim. Les feuilles
-   d'origine externe (Google Fonts) sont illisibles depuis le DOM (CORS) et
-   sans intérêt ici : on les ignore silencieusement. */
-function construirePdfPrintShim(){
-  if ($('#pdfPrintShim')) return;
-  let css = '';
-  for (const sheet of document.styleSheets) {
-    let rules;
-    try { rules = sheet.cssRules; } catch(e) { continue; }
-    if (!rules) continue;
-    for (const rule of rules) {
-      if (rule instanceof CSSMediaRule && /print/.test(rule.media.mediaText)) {
-        for (const r of rule.cssRules) {
-          if (!r.selectorText) continue;
-          const sel = r.selectorText.split(',').map(s => '.pdf-print ' + s.trim()).join(', ');
-          css += `${sel}{${r.style.cssText}}\n`;
-        }
-      }
-    }
-  }
-  const style = document.createElement('style');
-  style.id = 'pdfPrintShim';
-  style.textContent = css;
-  document.head.appendChild(style);
-}
-
 async function genererPdfBlob(){
   renderMachines(analyse());
   marqueVides();
-  construirePdfPrintShim();
   document.documentElement.classList.add('pdf-print');
   try {
     const opt = {
