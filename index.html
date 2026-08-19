@@ -7,6 +7,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<!-- génération du PDF envoyé par mail au support technique (bouton « Envoyer au support technique ») -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <style>
 :root{
   --bg:#E6E9EC;
@@ -398,6 +400,18 @@ input:disabled::placeholder{color:var(--ink-3);font-style:italic}
 }
 .print-only{display:none}
 
+/* ---------- capture PDF (envoi au support technique) ----------
+   html2canvas ignore @media print (il ne capture que la mise en page écran).
+   Pour que le PDF joint au mail soit identique à l'aperçu du bouton
+   « Imprimer / PDF », le script recopie au chargement les règles de
+   @media print ci-dessus sous un sélecteur .pdf-print (voir
+   construirePdfPrintShim() plus bas) : une seule source de vérité pour la
+   mise en page imprimée, réutilisée pour les deux sorties. */
+.mailbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.mailmsg{font-family:var(--cond);font-size:12px;letter-spacing:.03em;color:var(--ink-2)}
+.mailmsg.ok{color:var(--ok)}
+.mailmsg.bad{color:var(--bad)}
+
 /* ---------- panneau d'administration ---------- */
 .ovl{position:fixed;inset:0;z-index:60;background:rgba(17,21,26,.55);display:flex;align-items:stretch;justify-content:center;padding:22px}
 .ovl[hidden]{display:none}
@@ -578,10 +592,14 @@ input:disabled::placeholder{color:var(--ink-3);font-style:italic}
       <h2><span class="idx">11</span> Sortie</h2>
       <div class="card-body btnbar">
         <button class="btn primary" id="btnPrint">Imprimer / PDF</button>
+        <button class="btn" id="btnMail">Envoyer au support technique</button>
         <button class="btn" id="btnJson">Exporter le dossier (.json)</button>
         <button class="btn" id="btnCsv">Exporter le relevé (.csv)</button>
         <button class="btn" id="btnImport">Rouvrir un dossier</button>
         <input type="file" id="fileImport" accept=".json" class="hidden">
+      </div>
+      <div class="card-body mailbar" style="padding-top:0">
+        <span class="mailmsg" id="mailMsg"></span>
       </div>
     </div>
     <div class="print-only" id="printBlock"></div>
@@ -656,6 +674,139 @@ const Store = (() => {
     }
   };
 })();
+
+/* ===================== envoi au support technique =====================
+   Le bouton « Envoyer au support technique » génère un PDF du dossier dans le
+   navigateur (bibliothèque html2pdf.js) et le transmet à une Google Apps
+   Script déployée en application web, qui l'archive éventuellement sur le
+   Drive puis l'envoie par courriel en pièce jointe.
+
+   À RENSEIGNER après déploiement de la Apps Script (voir Code_MiseEnRoute.gs
+   fourni séparément) :
+     url          — l'URL /exec du déploiement
+     jeton        — le même secret que JETON_ATTENDU côté script
+     destinataire — l'adresse du service support technique
+     cc           — copie éventuelle (laisser vide sinon)
+     dossier      — id d'un dossier Drive si vous voulez archiver les PDF
+                    envoyés (laisser vide pour un simple envoi par mail) */
+const MAIL_CONFIG = {
+  url: 'https://script.google.com/macros/s/AKfycbwlWhDDCiLthEFVqc9rJKietNEbGTfFt3KJfkA9uetNGLErKXcK1CL-8fcO0Uf4FEmG/exec',
+  jeton: '1:722912603647:web:4bb3ac1a6fa30338a7cbcb',
+  destinataire: 'hay.leang@kaeser.com',
+  cc: '',
+  dossier: ''
+};
+
+/* recopie les règles de @media print sous .pdf-print, pour que html2canvas
+   (qui ne sait lire que la mise en page écran) rende la même chose que
+   l'impression : une passe unique, mémorisée dans #pdfPrintShim. Les feuilles
+   d'origine externe (Google Fonts) sont illisibles depuis le DOM (CORS) et
+   sans intérêt ici : on les ignore silencieusement. */
+function construirePdfPrintShim(){
+  if ($('#pdfPrintShim')) return;
+  let css = '';
+  for (const sheet of document.styleSheets) {
+    let rules;
+    try { rules = sheet.cssRules; } catch(e) { continue; }
+    if (!rules) continue;
+    for (const rule of rules) {
+      if (rule instanceof CSSMediaRule && /print/.test(rule.media.mediaText)) {
+        for (const r of rule.cssRules) {
+          if (!r.selectorText) continue;
+          const sel = r.selectorText.split(',').map(s => '.pdf-print ' + s.trim()).join(', ');
+          css += `${sel}{${r.style.cssText}}\n`;
+        }
+      }
+    }
+  }
+  const style = document.createElement('style');
+  style.id = 'pdfPrintShim';
+  style.textContent = css;
+  document.head.appendChild(style);
+}
+
+async function genererPdfBlob(){
+  renderMachines(analyse());
+  marqueVides();
+  construirePdfPrintShim();
+  document.documentElement.classList.add('pdf-print');
+  try {
+    const opt = {
+      margin: 9,
+      filename: `checklist_${slug()}.pdf`,
+      image: { type:'jpeg', quality:0.95 },
+      html2canvas: { scale:3, useCORS:true, backgroundColor:'#ffffff' },
+      jsPDF: { unit:'mm', format:'a4', orientation:'portrait' },
+      pagebreak: { mode:['css','legacy'], avoid:['.card','.mrow','.common','.checks'] }
+    };
+    return await html2pdf().set(opt).from($('main')).outputPdf('blob');
+  } finally {
+    document.documentElement.classList.remove('pdf-print');
+  }
+}
+
+function blobToBase64(blob){
+  return new Promise((resolve, reject) => {
+    const r = new FileReader();
+    r.onload = () => resolve(String(r.result).split(',')[1] || '');
+    r.onerror = () => reject(new Error('Lecture du PDF impossible.'));
+    r.readAsDataURL(blob);
+  });
+}
+
+async function envoyerSupport(){
+  const msg = $('#mailMsg'), btn = $('#btnMail');
+  msg.className = 'mailmsg';
+  if (!MAIL_CONFIG.url || !MAIL_CONFIG.jeton || !MAIL_CONFIG.destinataire){
+    msg.textContent = "Fonction non configurée : renseignez MAIL_CONFIG (url, jeton, destinataire) en tête du fichier.";
+    msg.classList.add('bad');
+    return;
+  }
+  btn.disabled = true;
+  try{
+    msg.textContent = 'Génération du PDF…';
+    const blob = await genererPdfBlob();
+    const b64 = await blobToBase64(blob);
+
+    msg.textContent = 'Envoi en cours…';
+    const client = S.s_client || 'Station';
+    const sujet = `Mise en route station — ${client}${S.s_date ? ' — ' + S.s_date : ''}`;
+    const corps = [
+      'Fiche de mise en route transmise automatiquement depuis le check-list de mise en service.',
+      '',
+      `Client : ${client}`,
+      `Date d'intervention : ${S.s_date || '—'}`,
+      `Technicien : ${S.s_tech || '—'}`
+    ].join('\n');
+
+    const payload = {
+      jeton: MAIL_CONFIG.jeton,
+      to: MAIL_CONFIG.destinataire,
+      sujet, corps,
+      pdf: b64,
+      fichier: `checklist_${slug()}.pdf`,
+      expediteur: 'KAESER — Mise en route station'
+    };
+    if (MAIL_CONFIG.cc) payload.cc = MAIL_CONFIG.cc;
+    if (MAIL_CONFIG.dossier) payload.dossier = MAIL_CONFIG.dossier;
+
+    const res = await fetch(MAIL_CONFIG.url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(payload)
+    });
+    const d = await res.json();
+    if (!d.ok) throw new Error(d.erreur || 'Échec de l\'envoi.');
+
+    msg.textContent = 'Envoyé au service support technique' + (d.lien ? ' (archivé sur le Drive).' : '.');
+    msg.classList.add('ok');
+  } catch(err){
+    msg.textContent = "Échec de l'envoi : " + (err && err.message ? err.message : String(err));
+    msg.classList.add('bad');
+  } finally {
+    btn.disabled = false;
+  }
+}
 
 /* ===================== catalogue (base figée + copie de travail) ===================== */
 const BASE = JSON.parse(JSON.stringify(CATALOGUE));
@@ -1697,6 +1848,7 @@ function slug(){ return (S.s_client || 'station').replace(/[^\w\- ]+/g,'').trim(
 function wire(){
   $('#addMachine').onclick = () => { S.machines.push(newMachine()); TAB='machines'; touch(); };
   $('#btnPrint').onclick = imprimer;
+  $('#btnMail').onclick = envoyerSupport;
   $('#btnNew').onclick = () => { if (confirm('Fermer ce dossier et repartir d\'une fiche vierge ?')) { S = blank(); seq = 1; paint(); go('station'); save(); } };
   $('#btnPrev').onclick = () => { const i = TABS.findIndex(t=>t[0]===TAB); if (i>0) go(TABS[i-1][0]); };
   $('#btnNext').onclick = () => { const i = TABS.findIndex(t=>t[0]===TAB); if (i<TABS.length-1) go(TABS[i+1][0]); };
