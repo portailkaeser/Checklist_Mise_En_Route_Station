@@ -1,0 +1,1909 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mise en route station — check-list de mise en service</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#E6E9EC;
+  --surface:#FFFFFF;
+  --surface-2:#F4F6F7;
+  --ink:#11151A;
+  --ink-2:#59616B;
+  --ink-3:#858D97;
+  --line:#D3D8DD;
+  --line-2:#AEB6BF;
+  --accent:#00596B;
+  --accent-2:#0A7E92;
+  --accent-soft:#DCEEF1;
+  --ok:#166B4A;
+  --ok-soft:#DFF0E7;
+  --warn:#8A5A05;
+  --warn-soft:#FBEED4;
+  --bad:#A82A1E;
+  --bad-soft:#FBE3E0;
+  --r:3px;
+  --sans:"IBM Plex Sans",system-ui,-apple-system,Segoe UI,sans-serif;
+  --cond:"IBM Plex Sans Condensed","IBM Plex Sans",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--bg);
+  color:var(--ink);
+  font-family:var(--sans);
+  font-size:14px;
+  line-height:1.45;
+  -webkit-font-smoothing:antialiased;
+}
+button,input,select,textarea{font-family:inherit;font-size:inherit;color:inherit}
+
+/* ---------- bandeau ---------- */
+.topbar{
+  position:sticky;top:0;z-index:40;
+  background:var(--ink);
+  color:#fff;
+  border-bottom:3px solid var(--accent-2);
+}
+.topbar-in{max-width:1180px;margin:0 auto;padding:10px 18px;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.brand{display:flex;align-items:baseline;gap:10px;min-width:0}
+.brand h1{
+  font-family:var(--cond);font-weight:700;font-size:19px;letter-spacing:.06em;
+  text-transform:uppercase;margin:0;white-space:nowrap;
+}
+.brand .sub{font-family:var(--mono);font-size:10.5px;color:#8FB6BE;letter-spacing:.08em;text-transform:uppercase}
+.topbar .spacer{flex:1}
+.chip-client{
+  font-family:var(--mono);font-size:11.5px;color:#C9D3D8;
+  border-left:1px solid #333B44;padding-left:14px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:340px;
+}
+.verdict{
+  display:flex;align-items:center;gap:8px;
+  font-family:var(--cond);font-weight:600;font-size:12.5px;letter-spacing:.08em;text-transform:uppercase;
+  padding:5px 12px;border-radius:2px;
+}
+.verdict .dot{width:9px;height:9px;border-radius:50%;background:currentColor;box-shadow:0 0 0 3px rgba(255,255,255,.14)}
+.verdict.ok{background:var(--ok-soft);color:#0E4F36}
+.verdict.warn{background:var(--warn-soft);color:#6B4604}
+.verdict.bad{background:var(--bad-soft);color:#8C2117}
+
+/* ---------- onglets ---------- */
+.tabs{background:var(--surface);border-bottom:1px solid var(--line);position:sticky;top:53px;z-index:35}
+.tabs-in{max-width:1180px;margin:0 auto;display:flex;overflow-x:auto;scrollbar-width:none}
+.tabs-in::-webkit-scrollbar{display:none}
+.tab{
+  appearance:none;background:none;border:none;border-bottom:3px solid transparent;
+  padding:12px 16px;cursor:pointer;white-space:nowrap;color:var(--ink-2);
+  font-family:var(--cond);font-weight:600;font-size:13.5px;letter-spacing:.05em;text-transform:uppercase;
+  display:flex;align-items:center;gap:8px;
+}
+.tab:hover{color:var(--ink);background:var(--surface-2)}
+.tab[aria-selected="true"]{color:var(--accent);border-bottom-color:var(--accent)}
+.tab .num{font-family:var(--mono);font-size:10px;color:var(--ink-3);font-weight:500}
+.tab[aria-selected="true"] .num{color:var(--accent-2)}
+.tab .badge{
+  font-family:var(--mono);font-size:10px;font-weight:600;min-width:17px;height:17px;
+  border-radius:9px;display:inline-flex;align-items:center;justify-content:center;padding:0 5px;
+  background:var(--bad);color:#fff;
+}
+.tab .badge.warn{background:var(--warn)}
+
+/* ---------- mise en page ---------- */
+main{max-width:1180px;margin:0 auto;padding:20px 18px 90px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);margin-bottom:16px}
+.card > h2{
+  margin:0;padding:11px 16px;border-bottom:1px solid var(--line);
+  font-family:var(--cond);font-weight:700;font-size:13px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--ink);display:flex;align-items:center;gap:10px;background:var(--surface-2);
+}
+.card > h2 .idx{font-family:var(--mono);font-size:10.5px;color:var(--accent-2);font-weight:600}
+.card > h2 .hint{margin-left:auto;font-family:var(--sans);font-weight:400;font-size:11.5px;letter-spacing:0;text-transform:none;color:var(--ink-3)}
+.card-body{padding:14px 16px}
+.grid{display:grid;gap:12px 18px}
+.g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+@media (max-width:860px){.g3,.g4{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){.g2,.g3,.g4{grid-template-columns:1fr}}
+/* champ élargi sur deux colonnes (ex. type + marque + taille de protection) : jamais sur mobile, une seule colonne */
+@media (min-width:561px){.f.span2{grid-column:span 2}}
+
+/* ---------- champs ---------- */
+.f{display:flex;flex-direction:column;gap:4px;min-width:0}
+.f > label{
+  font-family:var(--cond);font-size:11.5px;font-weight:600;letter-spacing:.055em;
+  text-transform:uppercase;color:var(--ink-2);
+}
+/* préserve la casse d'une notation technique (ex. classe de fusible Gg) dans un libellé tout capitales */
+.f > label .keep-case{text-transform:none}
+/* dans une grille, le libellé occupe deux lignes et se cale en bas :
+   les champs d'une même rangée démarrent alors tous à la même hauteur */
+.grid > .f > label{display:flex;align-items:flex-end;min-height:3em}
+.f > label > .lt{display:block;width:100%}
+.f > label .u{color:var(--ink-3);font-weight:500}
+.f input,.f select,.f textarea{
+  background:var(--surface);border:1px solid var(--line-2);border-radius:2px;
+  padding:7px 9px;width:100%;min-width:0;
+}
+/* hauteur commune aux champs de saisie et aux valeurs catalogue */
+.f input:not([type=checkbox]),.f select,.spec{height:36px;line-height:1.35}
+.f input[type=number],.f input.num{font-family:var(--mono);font-size:13.5px}
+.f input:focus,.f select:focus,.f textarea:focus{outline:2px solid var(--accent-2);outline-offset:-1px;border-color:var(--accent-2)}
+.f textarea{resize:vertical;min-height:74px;height:auto;line-height:1.45}
+/* plusieurs champs sous un même libellé (ex. protection installée) */
+.f .multi{display:flex;gap:6px}
+.f .multi input,.f .multi select{min-width:0;width:auto}
+.f .multi > *:nth-child(1){flex:1.3}
+.f .multi > *:nth-child(2){flex:1}
+.f .multi > *:nth-child(3){flex:0.8}
+.f.bad input,.f.bad select{border-color:var(--bad);background:#FFF8F7}
+.f .msg{font-size:11.5px;line-height:1.35;color:var(--ink-2);display:flex;align-items:center;gap:5px;min-height:1.35em}
+.f .msg.bad{color:var(--bad)}
+.f .msg.ok{color:var(--ok)}
+.f .msg.warn{color:var(--warn)}
+.f .msg b{font-family:var(--mono);font-weight:600}
+
+/* valeur constructeur (lecture seule) */
+.spec{
+  background:var(--accent-soft);border:1px solid #B9DCE3;border-radius:2px;
+  padding:0 9px;font-family:var(--mono);font-size:13.5px;color:#003D4A;
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+}
+.spec .tag{font-family:var(--cond);font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:#3E7E8B;font-weight:600}
+.spec.empty{background:var(--surface-2);border-color:var(--line);color:var(--ink-3)}
+
+/* ---------- champs non renseignés ---------- */
+.f input.miss,.f select.miss,.f textarea.miss,
+.tbl input.miss,.tbl select.miss,
+.common-body .tbl input.miss{border-color:var(--ink-3);background:#E4E8EB;color:var(--ink-2)}
+.f input.miss:focus,.f select.miss:focus,.f textarea.miss:focus,
+.tbl input.miss:focus{background:var(--surface);color:var(--ink)}
+input.miss::placeholder,textarea.miss::placeholder{color:var(--ink-3);opacity:1}
+.f.miss > label,.f.miss > label .u{color:var(--ink-3)}
+.chk.miss{background:#E4E8EB}
+.chk.miss:hover{background:#D7DDE2}
+.chk.miss input{border-color:var(--ink-3)}
+@media print{
+  .f input.miss,.f select.miss,.f textarea.miss,.tbl input.miss{
+    border-color:var(--ink-3) !important;
+  }
+}
+
+/* checklist */
+.checks{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:2px}
+.chk{display:flex;align-items:center;gap:11px;padding:9px 12px;border-bottom:1px solid var(--line);cursor:pointer}
+.chk:last-child{border-bottom:none}
+.chk:hover{background:var(--surface-2)}
+.chk input{appearance:none;width:19px;height:19px;flex:none;border:1.5px solid var(--line-2);border-radius:2px;background:#fff;cursor:pointer;position:relative}
+.chk input:checked{background:var(--ok);border-color:var(--ok)}
+.chk input:checked::after{content:"";position:absolute;left:6px;top:2px;width:5px;height:10px;border:2px solid #fff;border-top:0;border-left:0;transform:rotate(42deg)}
+.chk input:focus-visible{outline:2px solid var(--accent-2);outline-offset:2px}
+.chk span{flex:1}
+.chk .state{font-family:var(--cond);font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--bad)}
+.chk input:checked ~ .state{color:var(--ok)}
+
+/* ---------- machines ---------- */
+.mrow{border:1px solid var(--line);border-radius:var(--r);margin-bottom:14px;background:var(--surface)}
+.mhead{display:flex;align-items:center;gap:12px;padding:9px 12px;background:var(--ink);color:#fff;border-radius:2px 2px 0 0;flex-wrap:wrap}
+.mhead .n{font-family:var(--mono);font-size:11px;color:#7FB0BA;font-weight:600;letter-spacing:.06em}
+.mhead .t{font-family:var(--cond);font-weight:700;font-size:15px;letter-spacing:.04em;text-transform:uppercase}
+.mhead .t.void{color:#8B939C;font-weight:500;text-transform:none;font-style:italic;letter-spacing:0}
+.mhead .cool{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:2px 7px;border-radius:2px;background:#2A323B;color:#A8CDD5}
+.mhead .cool.eau{background:#0D4E5C;color:#9FDDE9}
+.mhead .sp{flex:1}
+.mhead .st{font-family:var(--cond);font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;padding:3px 8px;border-radius:2px}
+.mhead .st.ok{background:var(--ok-soft);color:#0E4F36}
+.mhead .st.warn{background:var(--warn-soft);color:#6B4604}
+.mhead .st.bad{background:var(--bad-soft);color:#8C2117}
+.mhead button.x{appearance:none;background:none;border:1px solid #39424C;color:#C3CBD3;border-radius:2px;padding:3px 9px;cursor:pointer;font-family:var(--cond);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase}
+.mhead button.x:hover{border-color:var(--bad);color:#FFB4AC}
+.mbody{padding:14px}
+.sect{
+  font-family:var(--cond);font-size:11px;font-weight:700;letter-spacing:.11em;text-transform:uppercase;
+  color:var(--accent);padding-bottom:5px;margin:6px 0 11px;border-bottom:1px solid var(--line);
+  display:flex;align-items:center;gap:8px;
+}
+.sect::before{content:"";width:14px;height:2px;background:var(--accent-2);flex:none}
+
+/* ---------- jauges (élément signature) ---------- */
+.gauge{margin-bottom:22px}
+.gauge-top{display:flex;align-items:baseline;gap:10px;margin-bottom:7px;flex-wrap:wrap}
+.gauge-top .lbl{font-family:var(--cond);font-weight:600;font-size:12.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-2)}
+.gauge-top .val{font-family:var(--mono);font-size:26px;font-weight:600;line-height:1;letter-spacing:-.02em}
+.gauge-top .val.ok{color:var(--ok)}
+.gauge-top .val.warn{color:var(--warn)}
+.gauge-top .val.bad{color:var(--bad)}
+.gauge-top .val.none{color:var(--ink-3);font-size:19px}
+.gauge-top .unit{font-family:var(--mono);font-size:12px;color:var(--ink-3)}
+.gauge-top .note{margin-left:auto;font-size:11.5px;color:var(--ink-2)}
+.scale{position:relative;height:30px;background:var(--surface-2);border:1px solid var(--line);border-radius:2px;overflow:hidden}
+.scale .zone{position:absolute;top:0;bottom:0;background:repeating-linear-gradient(135deg,#F6D9D5 0 6px,#FBE8E5 6px 12px)}
+.scale .fill{position:absolute;top:0;bottom:0;left:0;background:var(--ok);transition:width .35s cubic-bezier(.2,.7,.3,1)}
+.scale .fill.warn{background:var(--warn)}
+.scale .fill.bad{background:var(--bad)}
+.scale .tick{position:absolute;top:0;bottom:0;width:1px;background:var(--line-2)}
+.scale .tick.major{background:var(--ink-3)}
+.scale .limit{position:absolute;top:0;bottom:0;width:2px;background:var(--bad)}
+.scale-lbl{display:flex;justify-content:space-between;margin-top:3px;font-family:var(--mono);font-size:10px;color:var(--ink-3)}
+.bars{display:flex;flex-direction:column;gap:7px;margin-top:4px}
+.bar{display:grid;grid-template-columns:minmax(120px,1.6fr) 1fr 88px;gap:10px;align-items:center;font-size:12.5px}
+.bar .nm{font-family:var(--cond);font-weight:600;letter-spacing:.03em;text-transform:uppercase;font-size:12px;color:var(--ink-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bar .track{height:12px;background:var(--surface-2);border:1px solid var(--line);border-radius:2px;overflow:hidden}
+.bar .track i{display:block;height:100%;background:var(--accent-2)}
+.bar .qty{font-family:var(--mono);font-size:12px;text-align:right;color:var(--ink)}
+@media (max-width:560px){.bar{grid-template-columns:1fr 70px}.bar .track{grid-column:1/-1;order:3}}
+
+/* ---------- constats ---------- */
+.finding{display:flex;gap:11px;padding:11px 14px;border-bottom:1px solid var(--line);align-items:flex-start}
+.finding:last-child{border-bottom:none}
+.finding .sev{
+  flex:none;width:64px;font-family:var(--cond);font-size:10.5px;font-weight:700;letter-spacing:.08em;
+  text-transform:uppercase;padding:2px 0;text-align:center;border-radius:2px;margin-top:1px;
+}
+.finding.bad .sev{background:var(--bad-soft);color:#8C2117}
+.finding.warn .sev{background:var(--warn-soft);color:#6B4604}
+.finding .txt{flex:1;min-width:0}
+.finding .txt b{font-weight:600}
+.finding .txt .where{font-family:var(--mono);font-size:11px;color:var(--ink-3);display:block;margin-top:2px}
+.finding .goto{appearance:none;background:none;border:1px solid var(--line-2);border-radius:2px;padding:3px 9px;cursor:pointer;font-family:var(--cond);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-2);white-space:nowrap}
+.finding .goto:hover{border-color:var(--accent);color:var(--accent)}
+.empty-state{padding:34px 18px;text-align:center;color:var(--ink-2)}
+.empty-state .big{font-family:var(--cond);font-size:16px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--ink);margin-bottom:5px}
+
+/* ---------- boutons ---------- */
+.btn{
+  appearance:none;background:var(--surface);border:1px solid var(--line-2);border-radius:2px;
+  padding:8px 15px;cursor:pointer;
+  font-family:var(--cond);font-weight:600;font-size:12.5px;letter-spacing:.07em;text-transform:uppercase;
+  display:inline-flex;align-items:center;gap:8px;
+}
+.btn:hover{border-color:var(--accent);color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.primary:hover{background:var(--accent-2);border-color:var(--accent-2);color:#fff}
+.btn.ghost{border-style:dashed;width:100%;justify-content:center;padding:13px}
+.btnbar{display:flex;gap:9px;flex-wrap:wrap}
+
+/* ---------- barre de pied ---------- */
+.footbar{
+  position:fixed;left:0;right:0;bottom:0;z-index:38;
+  background:var(--surface);border-top:1px solid var(--line-2);
+  box-shadow:0 -2px 12px rgba(17,21,26,.07);
+}
+.footbar-in{max-width:1180px;margin:0 auto;padding:9px 18px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.footbar .save{font-family:var(--mono);font-size:11px;color:var(--ink-3);flex:1;min-width:120px}
+
+.tbl{width:100%;border-collapse:collapse;font-size:13px}
+.tbl th{
+  text-align:left;font-family:var(--cond);font-size:11px;font-weight:700;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--ink-2);padding:7px 10px;border-bottom:1px solid var(--line-2);white-space:nowrap;
+  vertical-align:bottom;
+}
+.tbl th .u2{display:block;font-weight:500;letter-spacing:.05em;color:var(--ink-3);text-transform:none;font-family:var(--mono);font-size:10px}
+.tbl th.n, .tbl thead th.n{text-align:right}
+/* un tableau plus large que la carte défile au lieu d'être coupé */
+.tblwrap{overflow-x:auto;-webkit-overflow-scrolling:touch;max-width:100%}
+.tblwrap > .tbl{min-width:max-content}
+.tbl td{padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+.tbl td:first-child{white-space:nowrap}
+.tbl td.n{font-family:var(--mono);text-align:right;white-space:nowrap}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tfoot td{font-weight:600;border-top:1px solid var(--line-2)}
+
+/* ---------- regroupement par type de machine ---------- */
+.group{margin-bottom:26px}
+.ghead{display:flex;align-items:center;gap:11px;margin:0 0 11px}
+.ghead h3{margin:0;font-family:var(--cond);font-weight:700;font-size:14px;letter-spacing:.11em;text-transform:uppercase;color:var(--ink)}
+.ghead .gn{font-family:var(--mono);font-size:11px;font-weight:600;background:var(--ink);color:#fff;border-radius:2px;padding:2px 8px}
+.ghead .line{flex:1;height:1px;background:var(--line-2)}
+.common{border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:var(--r);background:var(--surface);margin-bottom:14px}
+.common > h4{
+  margin:0;padding:10px 14px;border-bottom:1px solid var(--line);background:var(--accent-soft);
+  font-family:var(--cond);font-weight:700;font-size:12px;letter-spacing:.09em;text-transform:uppercase;color:#00485A;
+  display:flex;align-items:center;gap:10px;
+}
+.common > h4 .hint{margin-left:auto;font-family:var(--sans);font-weight:400;font-size:11.5px;letter-spacing:0;text-transform:none;color:#3E7E8B}
+.common-body{padding:14px}
+.common-body .tbl{margin-top:14px}
+.common-body .tbl input{border:1px solid var(--line-2);border-radius:2px;padding:5px 7px;width:110px;font-family:var(--mono);font-size:12.5px;text-align:right}
+
+.hidden{display:none !important}
+/* champs rendus sans objet par une réponse précédente */
+input:disabled,select:disabled{background:var(--surface-2);color:var(--ink-3);border-color:var(--line);cursor:not-allowed}
+input:disabled::placeholder{color:var(--ink-3);font-style:italic}
+.f .msg.lock{color:var(--ink-3);font-style:italic}
+.note{font-size:12px;color:var(--ink-2);background:var(--surface-2);border-left:2px solid var(--line-2);padding:8px 11px;margin-top:10px}
+.note b{font-weight:600;color:var(--ink)}
+/* ---------- impression : rapport complet, sections 01 à 10, mise en page compacte ---------- */
+@page{margin:9mm}
+@media print{
+  .topbar,.tabs,.footbar,.no-print{display:none !important}
+  body{background:#fff;font-size:9.5px;line-height:1.2}
+  main{padding:0;max-width:none}
+  /* toutes les étapes sont imprimées, pas seulement l'onglet affiché */
+  section[role="tabpanel"].hidden{display:block !important}
+  .print-only{display:block !important}
+
+  .card{break-inside:avoid;border-color:#9AA2AA;margin-bottom:4px}
+  .card > h2{padding:3px 7px;font-size:10px;letter-spacing:.08em}
+  .card > h2 .hint{font-size:8px}
+  .card-body{padding:4px 7px}
+  .grid{gap:2px 9px}
+
+  .f{gap:1px}
+  .f > label,.grid > .f > label{min-height:0;font-size:8px;letter-spacing:.03em}
+  .f input:not([type=checkbox]),.f select,.spec{height:15px;font-size:9px}
+  .f input,.f select{padding:0 4px}
+  .f input[type=number],.f input.num{font-size:9px}
+  .f textarea{min-height:26px;font-size:9px;padding:2px 4px}
+  .f .msg{font-size:7.5px;line-height:1.15;min-height:0}
+  .spec{padding:0 5px;font-size:9px}
+  .spec .tag{font-size:7.5px}
+
+  .checks{break-inside:avoid}
+  .chk{padding:1px 6px;gap:6px}
+  .chk input{width:11px;height:11px}
+  .chk input:checked::after{left:3px;top:1px;width:3px;height:5px;border-width:1.5px}
+  .chk .state{font-size:8px}
+
+  .sect{margin:4px 0 3px;padding-bottom:1px;font-size:8px}
+  .group{margin-bottom:6px}
+  .ghead{margin-bottom:4px}
+  .ghead h3{font-size:11px}
+  .mrow{margin-bottom:4px;break-inside:avoid}
+  .mhead{padding:2px 6px;gap:8px}
+  .mhead .t{font-size:11px}
+  .mhead .cool,.mhead .st{font-size:8px;padding:1px 5px}
+  .mhead button.x{display:none}
+  .mbody{padding:4px}
+  .common{margin-bottom:4px;break-inside:avoid}
+  .common > h4{padding:3px 7px;font-size:9px}
+  .common-body{padding:4px}
+  .common-body .tbl{margin-top:4px}
+  .common-body .tbl input{padding:1px 4px;width:70px;font-size:9px}
+
+  .gauge{margin-bottom:5px}
+  .gauge-top{margin-bottom:2px;gap:7px}
+  .gauge-top .lbl{font-size:9px}
+  .gauge-top .val{font-size:14px}
+  .gauge-top .val.none{font-size:11px}
+  .scale{height:12px}
+  .scale-lbl{font-size:7.5px}
+
+  .tbl{font-size:8.5px}
+  .tbl th,.tbl td{padding:2px 4px}
+  .tbl th{white-space:normal}
+  .tbl th .u2{font-size:7.5px}
+  .tblwrap{overflow:visible}
+  .finding{padding:3px 7px;gap:7px}
+  .finding .sev{width:46px;font-size:8px}
+  .finding .txt .where{font-size:8px}
+  .empty-state{padding:8px}
+  .empty-state .big{font-size:11px}
+
+  /* aides de saisie, sans objet sur le rapport */
+  .note{display:none}
+  #addMachine{display:none !important}
+
+  /* aplats conservés à l'impression (jauges, valeurs catalogue, en-têtes) */
+  .scale,.scale .fill,.scale .zone,.scale .limit,.spec,.card > h2,.mhead,
+  .common > h4,.chk input:checked,.finding .sev,.verdict{
+    -webkit-print-color-adjust:exact;print-color-adjust:exact;
+  }
+}
+.print-only{display:none}
+
+/* ---------- panneau d'administration ---------- */
+.ovl{position:fixed;inset:0;z-index:60;background:rgba(17,21,26,.55);display:flex;align-items:stretch;justify-content:center;padding:22px}
+.ovl[hidden]{display:none}
+.adm{background:var(--surface);border-radius:var(--r);width:100%;max-width:1400px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 18px 50px rgba(0,0,0,.35)}
+.adm-head{background:var(--ink);color:#fff;padding:11px 16px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.adm-head h3{margin:0;font-family:var(--cond);font-weight:700;font-size:16px;letter-spacing:.07em;text-transform:uppercase}
+.adm-head .sub{font-family:var(--mono);font-size:10.5px;color:#8FB6BE;letter-spacing:.06em;text-transform:uppercase}
+.adm-head .sp{flex:1}
+.adm-head button{appearance:none;background:none;border:1px solid #3A434D;color:#D6DDE3;border-radius:2px;padding:5px 12px;cursor:pointer;font-family:var(--cond);font-size:12px;letter-spacing:.07em;text-transform:uppercase}
+.adm-head button:hover{border-color:var(--accent-2);color:#fff}
+.adm-bar{padding:10px 16px;border-bottom:1px solid var(--line);background:var(--surface-2);display:flex;gap:9px;align-items:center;flex-wrap:wrap}
+.adm-bar input[type=search],.adm-bar select{border:1px solid var(--line-2);border-radius:2px;padding:6px 9px;background:#fff}
+.adm-bar input[type=search]{min-width:220px}
+.adm-bar .count{font-family:var(--mono);font-size:11.5px;color:var(--ink-2);margin-left:auto}
+.adm-body{overflow:auto;flex:1;padding:0}
+.adm-tbl{width:100%;border-collapse:separate;border-spacing:0;font-size:12.5px}
+.adm-tbl th{
+  position:sticky;top:0;z-index:2;background:var(--surface);text-align:left;
+  font-family:var(--cond);font-size:10.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;
+  color:var(--ink-2);padding:8px 7px;border-bottom:1px solid var(--line-2);white-space:nowrap;
+}
+.adm-tbl td{padding:3px 5px;border-bottom:1px solid var(--line);vertical-align:middle}
+.adm-tbl tr.edited td{background:#FFFCF2}
+.adm-tbl tr.added td{background:#F0F8F4}
+.adm-tbl input,.adm-tbl select{border:1px solid transparent;border-radius:2px;padding:5px 6px;width:100%;background:transparent}
+.adm-tbl input:hover,.adm-tbl select:hover{border-color:var(--line-2);background:#fff}
+.adm-tbl input:focus,.adm-tbl select:focus{outline:2px solid var(--accent-2);outline-offset:-1px;background:#fff}
+.adm-tbl input.n{font-family:var(--mono);text-align:right}
+.adm-tbl td.mdl input{font-family:var(--mono);font-weight:600}
+/* colonnes texte : largeur suffisante pour lire la valeur en entier */
+.adm-tbl th:nth-child(1),.adm-tbl td:nth-child(1){min-width:190px}
+.adm-tbl th:nth-child(2),.adm-tbl td:nth-child(2){min-width:180px}
+.adm-tbl th:nth-child(3),.adm-tbl td:nth-child(3){min-width:210px}
+.adm-tbl th:nth-child(5),.adm-tbl td:nth-child(5){min-width:130px}
+.adm-tbl th:nth-child(11),.adm-tbl td:nth-child(11){min-width:150px}
+.adm-tbl select{text-overflow:ellipsis}
+.adm-tbl .flag{font-family:var(--mono);font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--warn);white-space:nowrap}
+.adm-tbl tr.added .flag{color:var(--ok)}
+.adm-tbl button.del{appearance:none;background:none;border:1px solid var(--line);border-radius:2px;color:var(--ink-3);cursor:pointer;padding:3px 7px;font-family:var(--cond);font-size:11px;letter-spacing:.05em;text-transform:uppercase}
+.adm-tbl button.del:hover{border-color:var(--bad);color:var(--bad)}
+.adm-foot{padding:10px 16px;border-top:1px solid var(--line);background:var(--surface-2);display:flex;gap:9px;align-items:center;flex-wrap:wrap}
+.adm-foot .msg{font-family:var(--mono);font-size:11.5px;color:var(--ink-2);margin-left:auto}
+.gate{background:var(--surface);border-radius:var(--r);padding:26px;max-width:380px;margin:auto;align-self:center}
+.gate h3{margin:0 0 6px;font-family:var(--cond);font-size:16px;letter-spacing:.07em;text-transform:uppercase}
+.gate p{margin:0 0 14px;font-size:13px;color:var(--ink-2)}
+.gate input{width:100%;border:1px solid var(--line-2);border-radius:2px;padding:9px;font-family:var(--mono);font-size:17px;letter-spacing:.3em;text-align:center}
+.gate .err{color:var(--bad);font-size:12px;min-height:17px;margin-top:6px}
+@media (max-width:700px){.ovl{padding:0}.adm-tbl{font-size:11.5px}}
+@media (prefers-reduced-motion:reduce){*{transition:none !important;animation:none !important}}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-in">
+    <div class="brand">
+      <h1>Mise en route station</h1>
+      <span class="sub">check-list de mise en service</span>
+    </div>
+    <div class="spacer"></div>
+    <div class="chip-client" id="chipClient">Aucun chantier ouvert</div>
+    <div class="verdict ok" id="verdict"><span class="dot"></span><span id="verdictTxt">À compléter</span></div>
+  </div>
+</header>
+
+<nav class="tabs" role="tablist" aria-label="Étapes de la check-list">
+  <div class="tabs-in" id="tabs"></div>
+</nav>
+
+<main>
+  <!-- ============ 1. STATION ============ -->
+  <section id="panel-station" role="tabpanel">
+    <div class="card">
+      <h2><span class="idx">01</span> Chantier</h2>
+      <div class="card-body grid g3">
+        <div class="f"><label><span class="lt">Nom client + compte SAP</span></label><input id="s_client" placeholder="Nom du client + compte SAP"></div>
+        <div class="f"><label><span class="lt">CS n°</span></label><input id="s_cs" class="num" placeholder="N° CS"></div>
+        <div class="f"><label><span class="lt">Date d'intervention</span></label><input id="s_date" type="date"></div>
+        <div class="f"><label><span class="lt">Technicien</span></label><input id="s_tech" list="dl_tech" placeholder="Nom du technicien"><datalist id="dl_tech"></datalist></div>
+        <div class="f"><label><span class="lt">Température ambiante <span class="u">°C</span></span></label><input id="s_tamb" type="number" step="0.5" ><div class="msg" id="m_tamb"></div></div>
+        <div class="f"><label><span class="lt">Local hors gel</span></label><select data-seg="s_horsgel"></select></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2><span class="idx">02</span> Alimentation électrique</h2>
+      <div class="card-body grid g3">
+        <div class="f"><label><span class="lt">Tension triphasée <span class="u">V</span></span></label><input id="s_utri" type="number" step="1" ><div class="msg" id="m_utri"></div></div>
+        <div class="f"><label><span class="lt">Tension monophasée <span class="u">V</span></span></label><input id="s_umono" type="number" step="1" ><div class="msg" id="m_umono"></div></div>
+        <div class="f"><label><span class="lt">Régime de neutre</span></label><select id="s_neutre"></select></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2><span class="idx">03</span> Ventilation du local <span class="hint">Alimente le bilan aéraulique</span></h2>
+      <div class="card-body">
+        <div class="grid g3">
+          <div class="f"><label><span class="lt">Surface d'entrée d'air mesurée <span class="u">m²</span></span></label><input id="s_surfmes" type="number" step="0.01"></div>
+          <div class="f"><label><span class="lt">Type de grille</span></label><select id="s_grille"></select></div>
+          <div class="f"><label><span class="lt">Coefficient de passage libre</span></label><input id="s_coef" type="number" step="0.05" min="0.05" max="1"><div class="msg" id="m_coef"></div></div>
+        </div>
+        <div class="note"><b>Surface libre réelle = surface mesurée × coefficient.</b> Une grille annoncée « à 40 % » ne laisse passer que 40 % de sa surface : le bilan compare la surface <i>libre</i> à la surface exigée par les machines, ce que le tableur ne faisait pas. Le gainage se déclare désormais machine par machine, dans l'onglet Machines.</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2><span class="idx">04</span> Remarques chantier</h2>
+      <div class="card-body"><div class="f"><textarea id="s_remarques" placeholder="Contexte, particularités du local, réserves émises au client…"></textarea></div></div>
+    </div>
+  </section>
+
+  <!-- ============ 2. MACHINES ============ -->
+  <section id="panel-machines" role="tabpanel" class="hidden">
+    <div id="machineList"></div>
+    <button class="btn ghost" id="addMachine">+ Ajouter une machine</button>
+    <div class="note" style="margin-top:14px">Le tableur gérait 10 colonnes de machines. Ici, une machine par fiche, sans limite. Le choix du modèle remplit automatiquement les valeurs constructeur (protection, section de câble, section de gaine, surfaces et débits) depuis le catalogue de 282 modèles extrait du fichier.</div>
+  </section>
+
+  <!-- ============ 3. BILAN AÉRAULIQUE ============ -->
+  <section id="panel-air" role="tabpanel" class="hidden">
+    <div class="card">
+      <h2><span class="idx">05</span> Bilan aéraulique <span class="hint">Vitesse maxi 6 m/s · surface d'air frais selon machines</span></h2>
+      <div class="card-body" id="airCommun"></div>
+    </div>
+    <div id="airGroupes"></div>
+  </section>
+
+  <!-- ============ 4. RACCORDEMENTS ============ -->
+  <section id="panel-racc" role="tabpanel" class="hidden">
+    <div class="card">
+      <h2><span class="idx">06</span> Raccordement air comprimé</h2>
+      <div class="card-body grid g2">
+        <div class="f"><label><span class="lt">Liaison en sortie machine</span></label><select id="r_liaison"></select></div>
+        <div class="f"><label><span class="lt">Élément présent</span></label><select data-seg="r_liaisonok"></select></div>
+        <div class="f" id="f_compensateur"><label><span class="lt">Vis de réglage compensateur axial vérifiées</span></label><select data-seg="r_compensateur" data-na="1"></select></div>
+        <div class="f"><label><span class="lt">Vanne d'isolement présente</span></label><select data-seg="r_vanne"></select></div>
+      </div>
+    </div>
+    <div class="card">
+      <h2><span class="idx">07</span> Huile et premier démarrage</h2>
+      <div class="card-body grid g2">
+        <div class="f"><label><span class="lt">Appoint d'huile + rotation bloc au premier démarrage</span></label><select data-seg="r_huile"></select></div>
+        <div class="f"><label><span class="lt">Niveau d'huile vérifié</span></label><select data-seg="r_niveau"></select></div>
+      </div>
+    </div>
+    <div class="card">
+      <h2><span class="idx">08</span> Évacuation des condensats</h2>
+      <div class="card-body">
+        <div class="grid g2">
+          <div class="f"><label><span class="lt">Collecteur de condensat présent</span></label><select data-seg="r_collecteur"></select></div>
+          <div class="f"><label><span class="lt">Diamètre du collecteur <span class="u">mm</span></span></label><input id="r_diamcoll" type="number" step="1"></div>
+          <div class="f"><label><span class="lt">Pente du collecteur &gt; 1 % vers le traitement</span></label><select data-seg="r_pente"></select></div>
+          <div class="f"><label><span class="lt">Diamètre conduite d'évacuation purgeur <span class="u">mm</span></span></label><input id="r_diampurg" type="number" step="1"></div>
+          <div class="f"><label><span class="lt">Col de cygne sur chaque point de purge</span></label><select data-seg="r_colcygne"></select></div>
+          <div class="f"><label><span class="lt">Hauteur conduite évacuation purgeur &lt; 5 m</span></label><select data-seg="r_hauteur"></select></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 5. RAPPORT ============ -->
+  <section id="panel-rapport" role="tabpanel" class="hidden">
+    <div class="card">
+      <h2><span class="idx">09</span> Points à lever avant mise en service</h2>
+      <div id="findings"></div>
+    </div>
+    <div class="card">
+      <h2><span class="idx">10</span> Observations et signature</h2>
+      <div class="card-body">
+        <div class="f" style="margin-bottom:12px"><label><span class="lt">Observations</span></label><textarea id="s_observations" placeholder="Constats, essais réalisés, réserves, actions à la charge du client…"></textarea></div>
+        <div class="grid g3">
+          <div class="f"><label><span class="lt">Technicien</span></label><input id="s_tech2" list="dl_tech"></div>
+          <div class="f"><label><span class="lt">Date</span></label><input id="s_date2" type="date"></div>
+          <div class="f"><label><span class="lt">Mise en service prononcée</span></label><select data-seg="s_prononcee" data-na="1"></select></div>
+        </div>
+      </div>
+    </div>
+    <div class="card no-print">
+      <h2><span class="idx">11</span> Sortie</h2>
+      <div class="card-body btnbar">
+        <button class="btn primary" id="btnPrint">Imprimer / PDF</button>
+        <button class="btn" id="btnJson">Exporter le dossier (.json)</button>
+        <button class="btn" id="btnCsv">Exporter le relevé (.csv)</button>
+        <button class="btn" id="btnImport">Rouvrir un dossier</button>
+        <input type="file" id="fileImport" accept=".json" class="hidden">
+      </div>
+    </div>
+    <div class="print-only" id="printBlock"></div>
+  </section>
+</main>
+
+<div class="footbar no-print">
+  <div class="footbar-in">
+    <span class="save" id="saveState">—</span>
+    <button class="btn" id="btnAdmin">Catalogue</button>
+    <button class="btn" id="btnNew">Nouveau chantier</button>
+    <button class="btn" id="btnPrev">Précédent</button>
+    <button class="btn primary" id="btnNext">Suivant</button>
+  </div>
+</div>
+
+<!-- ============ ADMINISTRATION DU CATALOGUE ============ -->
+<div class="ovl no-print" id="gateOvl" hidden>
+  <div class="gate">
+    <h3>Accès catalogue</h3>
+    <p>Cette zone modifie les valeurs constructeur utilisées par tous les contrôles. Saisissez le code d'accès.</p>
+    <input id="gateCode" type="password" inputmode="numeric" maxlength="12" placeholder="••••" autocomplete="off">
+    <div class="err" id="gateErr"></div>
+    <div class="btnbar" style="margin-top:12px">
+      <button class="btn primary" id="gateOk">Ouvrir</button>
+      <button class="btn" id="gateCancel">Annuler</button>
+    </div>
+  </div>
+</div>
+
+<div class="ovl no-print" id="admOvl" hidden>
+  <div class="adm">
+    <div class="adm-head">
+      <h3>Catalogue machines</h3>
+      <span class="sub">valeurs constructeur et données de ventilation</span>
+      <span class="sp"></span>
+      <button id="admCode">Changer le code</button>
+      <button id="admClose">Fermer</button>
+    </div>
+    <div class="adm-bar">
+      <input type="search" id="admSearch" placeholder="Rechercher un modèle ou une famille…">
+      <select id="admGamme"></select>
+      <button class="btn primary" id="admAdd">+ Nouveau modèle</button>
+      <button class="btn" id="admAddGamme">+ Nouvelle gamme</button>
+      <span class="count" id="admCount"></span>
+    </div>
+    <div class="adm-body"><table class="adm-tbl" id="admTbl"></table></div>
+    <div class="adm-foot">
+      <button class="btn" id="admExport">Exporter le catalogue</button>
+      <button class="btn" id="admImport">Importer un catalogue</button>
+      <input type="file" id="admFile" accept=".json" class="hidden">
+      <button class="btn" id="admReset">Revenir au catalogue d'origine</button>
+      <span class="msg" id="admMsg"></span>
+    </div>
+  </div>
+</div>
+<script>
+const CATALOGUE = {"g":["Compresseur à vis","Sécheur frigorifique","Sécheur adsorption"],"f":["SXC.2","SX.2","SK.2","ASK.3","ASD.4","BSD.3 / BSD.4","CSD.5","CSD.6","CSDX.5 IE4 & CSDX.4 IE4 > 2017-10","CSDX.6","DSD.3","DSDX.3","ESD.4","FSD.3 ( LP)","HSD.3","SM.3","BSD.4","CSDX.5","DSDX.3 (PM240-2)","ESD.4 (PM240-2)","FSD.3"],"m":[["SXC 3 & CT 4",10.0,"5x1,5",0.12,0.2,450.0,850.0,1500.0,0,0,"4x1,5 + 3x1.5"],["SXC 4 & CT 4",10.0,"5x1,5",0.12,0.2,450.0,850.0,1700.0,0,0,"4x1,5 + 3x1.5"],["SXC 6 & CT 8",16.0,"5x2,5",0.12,0.2,650.0,850.0,2100.0,0,0,"4x2,5 + 3x,1,5"],["SXC 8 & CT 8",16.0,"5x2,5",0.12,0.25,650.0,950.0,2600.0,0,0,"4x2,5 + 3x1,5"],["SX 3",10.0,"4x1.5",0.125,0.2,null,1000.0,1000.0,0,1],["SX 3 T",10.0,"4x1.5",0.125,0.2,450.0,1000.0,1500.0,0,1],["SX 4",10.0,"4x1,5",0.125,0.2,null,1000.0,1200.0,0,1],["SX 4 T",10.0,"4x1,5",0.125,0.2,450.0,1000.0,1700.0,0,1],["SX 6",16.0,"4x2,5",0.125,0.2,null,1000.0,1500.0,0,1],["SX 6 T",16.0,"4x2,5",0.125,0.2,650.0,1000.0,2100.0,0,1],["SX 8",16.0,"4x2,5",0.125,0.2,null,1300.0,2000.0,0,1],["SX 8 T",16.0,"4x2,5",0.125,0.2,650.0,1300.0,2600.0,0,1],["SM10",16.0,"4x2,5",0.25,0.2,null,2100.0,2500.0,0,1],["SM10T",20.0,"4x2,5",0.25,0.25,570.0,2100.0,3200.0,0,1],["SM13",20.0,"4x2,5",0.25,0.25,null,2100.0,2500.0,0,1],["SM13T",25.0,"4x4",0.25,0.3,570.0,2100.0,3700.0,0,1],["SM16",25.0,"4x4",0.25,0.3,null,2100.0,2500.0,0,1],["SM16T",32.0,"4x6",0.25,0.35,570.0,2100.0,4400.0,0,1],["SK 22",32.0,"4x6",0.27,0.35,null,2500.0,4500.0,0,2],["SK 22 T",32.0,"4x6",0.27,0.45,570.0,2500.0,5500.0,0,2],["SK 25",40.0,"4x6",0.27,0.4,null,3000.0,5500.0,0,2],["SK 25 T",40.0,"4x6",0.27,0.5,570.0,3000.0,6500.0,0,2],["ASK 28",40.0,"4x10",0.33,0.5,null,4000.0,6000.0,0,3],["ASK 28 T",40.0,"4x10",0.33,0.6,1300.0,4000.0,8000.0,0,3],["ASK 34",50.0,"4x10",0.33,0.5,null,4000.0,7500.0,0,3],["ASK 34 T",50.0,"4x10",0.33,0.7,1300.0,5000.0,9500.0,0,3],["ASK 40",50.0,"4x10",0.33,0.6,null,5000.0,9000.0,0,3],["ASK 40 T",63.0,"4x16",0.33,0.8,1300.0,5000.0,11000.0,0,3],["ASD 35",40.0,"4x10",0.36,0.5,null,3800.0,7000.0,0,4],["ASD 35 T",50.0,"4x10",0.36,0.6,1640.0,3800.0,9000.0,0,4],["ASD 40",50.0,"4x10",0.36,0.6,null,3800.0,8000.0,0,4],["ASD 40 LP",50.0,"4x10",0.36,0.6,null,3800.0,8000.0,0,4],["ASD 40 T",50.0,"4x10",0.36,0.7,1640.0,3800.0,10000.0,0,4],["ASD 50",63.0,"4x16",0.36,0.7,null,4500.0,10000.0,0,4],["ASD 50 T",63.0,"4x16",0.36,0.8,1640.0,4500.0,12000.0,0,4],["ASD 60",80.0,"4x25",0.36,0.8,null,5400.0,12000.0,0,4],["ASD60 T",80.0,"4x25",0.36,0.9,1640.0,5400.0,14000.0,0,4],["BSD 65 A",80.0,"4x25",0.49,0.8,null,6500.0,11000.0,0,5],["BSD 65 W",80.0,"4x25",null,0.2,null,null,1700.0,0,5],["BSD 65 T A",80.0,"4x25",0.49,0.9,2000.0,6500.0,13000.0,0,5],["BSD 65 T W",80.0,"4x25",null,0.3,null,null,3700.0,0,5],["BSD 75 A",100.0,"4x35",0.49,1.0,null,8000.0,14000.0,0,5],["BSD 75 W",100.0,"4x35",null,0.2,null,null,2100.0,0,5],["BSD 75 T A",100.0,"4x35",0.49,1.1,2000.0,8000.0,16000.0,0,5],["BSD 75 T W",100.0,"4x35",null,0.3,2000.0,null,4100.0,0,5],["BSD 83 A",100.0,"4x35",0.49,1.2,null,8000.0,17000.0,0,5],["BSD 83 W",100.0,"4x35",null,0.2,null,null,2500.0,0,5],["BSD 83 T A",100.0,"4x35",0.49,1.4,2000.0,8000.0,20000.0,0,5],["BSD 83 T W",100.0,"4x35",null,0.4,2000.0,null,5500.0,0,5],["CSD 85 A",100.0,"4x35",0.6,1.2,null,9700.0,17000.0,0,6],["CSD 85 W",100.0,"4x35",null,0.2,1400.0,null,2500.0,0,6],["CSD 85 A LP",100.0,"4x35",0.6,null,null,null,null,0,6],["CSD 85 W LP",100.0,"4x35",null,null,null,null,null,0,6],["CSD 85 T A",100.0,"4x35",0.6,1.4,null,8000.0,20000.0,0,6],["CSD 85 T W",100.0,"4x35",null,0.6,3500.0,null,7000.0,0,6],["CSD 105 A",125.0,"4x50",0.6,1.4,null,9400.0,20000.0,0,6],["CSD 105 W",125.0,"4x50",null,0.2,1400.0,null,3000.0,0,6],["CSD 105 A LP",125.0,"4x50",0.6,null,null,null,null,0,6],["CSD 105 W LP",125.0,"4x50",null,null,null,null,null,0,6],["CSD 105 T A",125.0,"4x50",0.6,1.6,null,8000.0,24000.0,0,6],["CSD 105 T W",125.0,"4x50",null,0.6,3500.0,null,7000.0,0,6],["CSD 125 A",160.0,"4x70",0.6,1.8,null,10700.0,25000.0,0,6],["CSD 125 W",160.0,"4x70",null,0.3,1400.0,null,4000.0,0,6],["CSD 125 T A",160.0,"4x70",0.6,2.0,null,9300.0,29000.0,0,6],["CSD 125 T W",160.0,"4x70",null,0.6,5500.0,null,7000.0,0,6],["CSD 90 A",100.0,"4x35",0.6,1.2,null,8000.0,17000.0,0,7],["CSD 90 W",100.0,"4x35",null,0.2,1400.0,null,2500.0,0,7],["CSD 90 T A",125.0,"4x50",0.6,1.4,1800.0,8000.0,20000.0,0,7],["CSD 90 T W",125.0,"4x50",null,0.6,1800.0,3200.0,7000.0,0,7],["CSD 110 A",125.0,"4x50",0.6,1.4,null,9500.0,20000.0,0,7],["CSD 110 W",125.0,"4x50",null,0.2,1400.0,null,3000.0,0,7],["CSD 110 T A",125.0,"4x50",0.6,1.6,1800.0,9500.0,24000.0,0,7],["CSD 110 T W",125.0,"4x50",null,0.6,3200.0,null,7000.0,0,7],["CSD 130 A",160.0,"4x70",0.6,1.8,null,11000.0,25000.0,0,7],["CSD 130 W",160.0,"4x70",null,0.3,1400.0,null,4000.0,0,7],["CSD 130 T A",160.0,"4x70",0.6,2.0,1800.0,11000.0,29000.0,0,7],["CSD 130 T W",160.0,"4x70",null,0.5,3200.0,null,7000.0,0,7],["CSDX 140 A IE4 > 2017-10",160.0,"4x70",1.0,1.8,null,11000.0,25000.0,0,8],["CSDX 165 A IE4 > 2017-10",200.0,"4x95",1.0,2.2,null,13000.0,30000.0,0,8],["CSDX 140 W IE4 > 2017-10",160.0,"4x70",null,0.3,1400.0,null,4000.0,0,8],["CSDX 165 W IE4 > 2017-10",200.0,"4x95",null,0.3,1400.0,null,4700.0,0,8],["CSDX 140 T",160.0,"4x70",1.0,2.3,null,9600.0,32000.0,0,8],["CSDX 165 T A IE4 > 2017-10",200.0,"4x95",1.0,2.7,null,11600.0,37000.0,0,8],["CSDX 140 T W IE4 > 2017-10",160.0,"4x70",null,0.8,5700.0,null,11000.0,0,8],["CSDX 165 T W",200.0,"4x95",null,0.8,5700.0,null,12000.0,0,8],["CSDX 145 A",160.0,"4x70",0.7,1.8,null,11000.0,25000.0,0,9],["CSDX 145 W",160.0,"4x70",null,0.3,1400.0,null,4000.0,0,9],["CSDX 145 T A",200.0,"4x95",0.7,2.3,3600.0,11000.0,32000.0,0,9],["CSDX 145 T W",200.0,"4x95",null,0.8,5000.0,null,11000.0,0,9],["CSDX 175 A",200.0,"4x95",0.7,2.2,null,13000.0,30000.0,0,9],["CSDX 175 W",200.0,"4x95",null,0.3,1400.0,null,4700.0,0,9],["CSDX 175 T A",200.0,"4x95",0.7,2.7,5000.0,13000.0,37000.0,0,9],["CSDX 175 T W",200.0,"4x95",null,0.8,3600.0,1400.0,12000.0,0,9],["DSD 145 A DSD 145 A LP","160\n160","4x70 4x70",1.4,1.8,null,11000.0,26000.0,0,10],["DSD 175 A",200.0,"4x95",1.4,2.1,null,13000.0,30000.0,0,10],["DSD 205 A",224.0,"4x120",1.4,2.7,null,17000.0,38000.0,0,10],["DSD 240 A",315.0,"4x150",1.4,3.2,null,20000.0,45000.0,0,10],["DSD 145 W",160.0,"4x70",null,0.3,2000.0,null,5000.0,0,10],["DSD 145 W LP",160.0,"4x70",null,0.3,2000.0,null,5000.0,0,10],["DSD 175 W",200.0,"4x95",null,0.3,2000.0,null,5000.0,0,10],["DSD 205 W",224.0,"4x120",null,0.4,2000.0,null,6000.0,0,10],["DSD 240 W",315.0,"4x150",null,0.5,2000.0,null,7000.0,0,10],["DSD 145 T A",160.0,"4x70",1.4,2.3,4500.0,11000.0,30000.0,0,10],["DSD 175 T A",200.0,"4x95",1.4,2.6,4500.0,13000.0,35000.0,0,10],["DSD 205 T A",250.0,"4x120",1.4,3.2,4500.0,17000.0,44000.0,0,10],["DSD 240 T A",315.0,"4x185",1.4,3.7,4500.0,20000.0,52000.0,0,10],["DSD 145 T W",160.0,"4x70",null,0.6,4500.0,9000.0,9000.0,0,10],["DSD 175 T W",200.0,"4x95",null,0.7,4500.0,10000.0,10000.0,0,10],["DSD 205 T W",224.0,"4x120",null,0.8,4500.0,12000.0,12000.0,0,10],["DSD 240 T W",315.0,"4x150",null,1.0,4500.0,14000.0,14000.0,0,10],["DSDX 175 A LP",200.0,"4x95",1.4,2.1,null,13000.0,30000.0,0,11],["DSDX 175 W LP",200.0,"4x95",null,0.3,null,2000.0,5000.0,0,11],["DSDX 245 A",315.0,"4x70 double",1.44,3.2,null,22000.0,45000.0,0,11],["DSDX 305 A",315.0,"4x95 double",1.44,4.0,null,22000.0,55000.0,0,11],["DSDX 245 W",315.0,"4x70 double",null,0.5,null,5000.0,7000.0,0,11],["DSDX 305 W",315.0,"4x70 double",null,0.6,null,5000.0,7000.0,0,11],["ESD 375 A ESD.4",400.0,"4x120 double",1.92,4.2,null,30000.0,60000.0,0,12],["ESD 445 A ESD.4",500.0,"4x150 double",1.92,5.2,null,34000.0,750000.0,0,12],["ESD 375 W ESD.4",400.0,"4x120 double",null,0.7,null,5000.0,100000.0,0,12],["ESD 445 W ESD.4",500.0,"4x150 double",null,0.8,null,5000.0,120000.0,0,12],["ESD 245 A LP ESD.4",315.0,"4x150",1.92,3.2,null,22000.0,45000.0,0,12],["ESD 305 A LP ESD.4",400.0,"4x95 double",1.92,3.9,null,26000.0,55000.0,0,12],["ESD 375 A LP ESD.4",400.0,"4x95 double",1.92,4.2,null,30000.0,60000.0,0,12],["ESD 245 W LP",315.0,"4x150",null,0.5,5000.0,null,6500.0,0,12],["ESD 305 W LP",315.0,"4x95 double",null,0.6,5000.0,null,8500.0,0,12],["ESD 375 W LP ESD.4",400.0,"4x95 double",null,0.7,5000.0,null,10000.0,0,12],["FSD 475 A",500.0,"4x150 double",1.98,6.0,null,35000.0,null,0,13],["FSD 575 A",630.0,"4x120 triple",1.98,7.0,null,40000.0,null,0,13],["FSD 475 W",500.0,"4x150 double",null,1.0,null,5000.0,13000.0,0,13],["FSD 575 W",630.0,"4x120 triple",null,1.2,null,5000.0,16000.0,0,13],["HSD 662 W",800.0,"4x150 triple",null,1.3,null,10000.0,18000.0,0,14],["HSD 722 W",800.0,"4x185 triple",null,1.4,null,10000.0,20000.0,0,14],["HSD 782 W",1000.0,"4x150 quadruple",null,1.5,null,10000.0,22000.0,0,14],["HSD 842 W",1000.0,"4x150 quadruple",null,1.7,null,10000.0,24000.0,0,14],["SM 13 SFC",32.0,"4x10",0.25,0.25,null,2100.0,3300.0,0,15],["SM 13 T SFC",32.0,"4x10",0.25,0.3,700.0,2100.0,4000.0,0,15],["SK 22 SFC",35.0,"4x10",0.27,null,null,null,null,0,2],["SK 22 T SFC",50.0,"4x10",0.27,null,null,null,null,0,2],["SK 25 SFC",50.0,"4x10",0.27,null,null,null,null,0,2],["SK 25 T SFC",50.0,"4x10",0.27,null,null,null,null,0,2],["ASK 34 T SFC",63.0,"4x16",0.33,0.7,2000.0,4000.0,10000.0,0,3],["ASK 40 T SFC",80.0,"4x25",0.33,0.8,2000.0,5000.0,12000.0,0,3],["ASK 34 SFC",63.0,"4x16",0.33,0.6,null,4000.0,8000.0,0,3],["ASK 40 SFC",80.0,"4x25",0.33,0.4,null,5000.0,10000.0,0,3],["ASD 35 SFC",63.0,"4x16",0.36,0.6,null,4500.0,8000.0,0,4],["ASD 40 SFC",80.0,"4x16",0.36,0.7,null,4500.0,9000.0,0,4],["ASD 50 SFC",80.0,"4x16",0.36,0.8,null,4500.0,11000.0,0,4],["ASD 60 SFC",100.0,"4x25",0.36,0.9,null,5400.0,13000.0,0,4],["ASD 35 (T) SFC",63.0,"4x16",0.36,0.7,2000.0,4500.0,10000.0,0,4],["ASD 40 (T) SFC",80.0,"4x16",0.36,0.8,2000.0,4500.0,11000.0,0,4],["ASD 50 (T) SFC",80.0,"4x16",0.36,0.9,2000.0,4500.0,13000.0,0,4],["ASD 60 (T) SFC",100.0,"4x25",0.36,1.0,2000.0,5400.0,15000.0,0,4],["BSD 75 SFC",100.0,"4x35",0.49,1.2,null,7000.0,17000.0,0,16],["BSD 75 T SFC",100.0,"4x35",0.49,1.2,3000.0,7000.0,17000.0,0,16],["BSD 75 SFC W",100.0,"4x35",null,0.4,null,null,2500.0,0,16],["BSD 75 T SFC W",100.0,"4x35",null,0.4,3000.0,null,4100.0,0,16],["CSD 85 (T) SFC",125.0,"4x35",0.6,null,null,null,null,0,6],["CSD 105 (T) SFC",160.0,"4x50",0.6,null,null,null,null,0,6],["CSD 125 (T) SFC",160.0,"4x70",0.6,null,null,null,null,0,6],["CSD 90A T SFC",125.0,"4x35",0.6,1.5,3200.0,8000.0,22000.0,0,7],["CSD 110A T SFC",125.0,"4x50",0.6,1.8,3200.0,9500.0,26000.0,0,7],["CSD 130A T SFC",160.0,"4x70",0.6,2.5,3200.0,11000.0,31000.0,0,7],["CSD 90W T SFC",125.0,"4x35",null,0.6,3200.0,1400.0,7500.0,0,7],["CSD 110W T SFC",125.0,"4x50",null,0.7,3200.0,1400.0,9000.0,0,7],["CSD 130W T SFC",160.0,"4x70",null,0.7,3200.0,1400.0,10000.0,0,7],["CSD 90A SFC",100.0,"4x35",0.6,1.3,null,8000.0,19000.0,0,7],["CSD 110A SFC",125.0,"4x50",0.6,1.5,null,9500.0,22000.0,0,7],["CSD 130A SFC",160.0,"4x70",0.6,1.9,null,11000.0,27000.0,0,7],["CSD 90W SFC",100.0,"4x35",null,0.4,1400.0,null,4500.0,0,7],["CSD 110W SFC",125.0,"4x35",null,0.4,1400.0,null,5000.0,0,7],["CSD 130W SFC",160.0,"4x70",null,0.5,1400.0,null,6000.0,0,7],["CSDX 140 (T) SFC",200.0,"4x70",null,null,null,null,null,0,17],["CSDX 165 (T) SFC",250.0,"4x95",null,null,null,null,null,0,17],["CSDX 145A T SFC",200.0,"4x70",0.7,2.4,3600.0,11000.0,34000.0,0,9],["CSDX 175A T SFC",200.0,"4x95",0.7,2.8,3600.0,13000.0,39000.0,0,9],["CSDX 200A T SFC",250.0,"4x95",0.7,3.4,3600.0,15000.0,47000.0,0,9],["CSDX 145W T SFC",160.0,"4x70",null,1.0,5000.0,null,13000.0,0,9],["CSDX 175W T SFC",200.0,"4x95",null,1.2,5000.0,null,14000.0,0,9],["CSDX 200W T SFC",250.0,"4x95",null,1.4,5000.0,null,15000.0,0,9],["CSDX 145A SFC",160.0,"4x70",0.7,1.9,null,11000.0,27000.0,0,9],["CSDX 175A SFC",200.0,"4x95",0.7,2.2,null,13000.0,32000.0,0,9],["CSDX 200 A SFC",250.0,"4x95",0.7,2.7,null,15000.0,40000.0,0,9],["CSDX 145W SFC",160.0,"4x70",null,0.5,1400.0,null,6000.0,0,9],["CSDX 175W SFC",200.0,"4x95",null,0.6,1400.0,null,7000.0,0,9],["CSDX 200 W SFC",250.0,"4x95",null,0.7,1400.0,null,8000.0,0,9],["DSD145A SFC",200.0,"4x95",1.4,2.0,null,11000.0,28000.0,0,10],["DSD145A T SFC",200.0,"4x95",1.4,2.2,null,11000.0,32000.0,0,10],["DSD175A SFC",250.0,"4x95",1.4,2.2,null,13000.0,32000.0,0,10],["DSD175A T SFC",250.0,"4x95",1.4,2.6,null,13000.0,37000.0,0,10],["DSD205A SFC",250.0,"4x120",1.4,2.8,null,17000.0,40000.0,0,10],["DSD205A T SFC",315.0,"4x70 double",1.4,3.2,null,17000.0,46000.0,0,10],["DSD240A SFC",250.0,"4x120",1.4,3.2,null,20000.0,45000.0,0,10],["DSD240A T SFC",315.0,"4x70 double",1.4,3.6,null,20000.0,52000.0,0,10],["DSD145W SFC",200.0,"4x70",null,0.4,2000.0,null,7000.0,0,10],["DSD145W T SFC",200.0,"4x95",null,0.8,4500.0,null,11000.0,0,10],["DSD175W SFC",200.0,"4x95",null,0.5,2000.0,null,7000.0,0,10],["DSD175W T SFC",250.0,"4x95",null,0.8,4500.0,null,12000.0,0,10],["DSD205W SFC",250.0,"4x120",null,0.6,2000.0,null,9000.0,0,10],["DSD205W T SFC",250.0,"4x70 double",null,1.1,4500.0,null,15000.0,0,10],["DSD240W SFC",250.0,"4x120",null,0.7,2000.0,null,10000.0,0,10],["DSD240W T SFC",250.0,"4x70 double",null,1.2,4500.0,null,17000.0,0,10],["DSDX 245 A SFC",315.0,"4x70 double",1.45,3.5,null,22000.0,50000.0,0,18],["DSDX 305 A SFC",400.0,"4x95 double",1.45,4.2,null,22000.0,60000.0,0,18],["DSDX 245 W SFC",315.0,"4x70 double",null,0.8,5000.0,null,11000.0,0,18],["DSDX 305 W SFC",400.0,"4x95 double",null,0.9,5000.0,null,13000.0,0,18],["ESD 375 A SFC",500.0,"4x150 double",1.92,4.6,null,30000.0,65000.0,0,19],["ESD 445 A SFC",500.0,"4x150 double",1.92,5.6,null,34000.0,80000.0,0,19],["ESD 375 W SFC",500.0,"4x150 double",null,1.1,5000.0,null,15000.0,0,19],["ESD 445 W SFC",500.0,"4x150 double",null,1.2,5000.0,null,18000.0,0,19],["FSD 475 A SFC",630.0,"4x185 double",1.98,6.5,null,35000.0,null,0,20],["FSD 575 A SFC",800.0,"4x120 triple",1.98,7.5,null,40000.0,null,0,20],["FSD 475 W SFC",630.0,"4x150 double",null,1.5,5000.0,null,20000.0,0,20],["FSD 575 W SFC",630.0,"4x120 triple",null,1.7,5000.0,null,24000.0,0,20],["HSD 662 SFC",800.0,"4x150 triple",0.85,1.3,null,10000.0,18000.0,0,14],["HSD 782 SFC",1000.0,"4x150 quadruple",0.85,1.5,null,10000.0,22000.0,0,14],["HSD 842 SFC",1000.0,"4x150 quadruple",0.85,1.7,null,10000.0,24000.0,0,14],["TAH5",2.0,"3x1,5",null,0.1,235.0,null,null,1,null],["TAH7",4.0,"3x1,5",null,0.1,330.0,null,null,1,null],["TAH10",4.0,"3x1,5",null,0.1,450.0,null,null,1,null],["TBH14",16.0,"3x1,5",null,0.1,650.0,null,null,1,null],["TBH16",16.0,"3x1,5",null,0.1,3790.0,null,null,1,null],["TBH23",16.0,"3x1,5",null,0.1,570.0,null,null,1,null],["TCH27",16.0,"3x1,5",null,0.1,717.0,null,null,1,null],["TCH33",16.0,"3x1,5",null,0.1,717.0,null,null,1,null],["TCH36",16.0,"3x1,5",null,0.1,717.0,null,null,1,null],["TCH45",16.0,"3x1,5",null,0.2,1680.0,null,null,1,null],["TA5",6.0,"3x1,5",null,0.1,650.0,null,null,1,null],["TA8",6.0,"3x1,5",null,0.1,650.0,null,null,1,null],["TA11",6.0,"3x1,5",null,0.1,650.0,null,null,1,null],["TB19",10.0,"3x1,5",null,0.1,710.0,null,null,1,null],["TB26",10.0,"3x1,5",null,0.1,870.0,null,null,1,null],["TC31",16.0,"3x1,5",null,0.2,1980.0,null,null,1,null],["TC36",16.0,"3x1,5",null,0.2,1980.0,null,null,1,null],["TD52",10.0,"3x1,5",null,0.25,2080.0,null,null,1,null],["TD67",16.0,"3x1,5",null,0.25,2080.0,null,null,1,null],["TD73",16.0,"3x1,5",null,0.25,2080.0,null,null,1,null],["TD94",16.0,"3x1,5",null,0.25,2080.0,null,null,1,null],["TE102",6.0,"4x1,5",null,0.4,2530.0,null,null,1,null],["TE122",10.0,"4x1,5",null,0.4,2530.0,null,null,1,null],["TE142",10.0,"4x1,5",null,0.4,2530.0,null,null,1,null],["TF174",16.0,"4x2,5",null,0.6,5000.0,null,null,1,null],["TF230",16.0,"4x2,5",null,0.6,5000.0,null,null,1,null],["TF280",20.0,"4x2,5",null,0.8,6500.0,null,null,1,null],["TF340",20.0,"4x2,5",null,0.8,6500.0,null,null,1,null],["TG450",20.0,"4x2,5",null,0.6,5000.0,5000.0,null,1,null],["TG520",20.0,"4x2,5",null,0.8,6600.0,6600.0,null,1,null],["TG650",20.0,"4x2,5",null,0.9,7100.0,7100.0,null,1,null],["TG780",25.0,"4x4",null,0.9,8500.0,8500.0,null,1,null],["TG980",40.0,"4x6",null,1.3,12500.0,12500.0,null,1,null],["TF174 W",16.0,"4x2,5",null,null,null,null,null,1,null],["TF230 W",16.0,"4x2,5",null,null,null,null,null,1,null],["TF280 W",20.0,"4x2,5",null,null,null,null,null,1,null],["TF340 W",20.0,"4x2,5",null,null,null,null,null,1,null],["TG450 W",20.0,"4x2,5",null,null,null,null,null,1,null],["TG520 W",20.0,"4x2,5",null,null,null,null,null,1,null],["TG650 W",20.0,"4x2,5",null,null,null,null,null,1,null],["TG780 W",25.0,"4x4",null,null,null,null,null,1,null],["TG980 W",40.0,"4x6",null,null,null,null,null,1,null],["DC2.0",16.0,"3x1,5",null,null,null,null,null,2,null],["DC3.7",16.0,"3x1,5",null,null,null,null,null,2,null],["DC5.0",16.0,"3x1,5",null,null,null,null,null,2,null],["DC5.9",16.0,"3x1,5",null,null,null,null,null,2,null],["DC7.6",16.0,"3x1,5",null,null,null,null,null,2,null],["DC11.3",16.0,"3x1,5",null,null,null,null,null,2,null],["i.DC 16",16.0,"3x1,5",null,null,null,null,null,2,null],["i.DC 23",16.0,"3x1,5",null,null,null,null,null,2,null],["i.DC 34",16.0,"3x1,5",null,null,null,null,null,2,null],["i.DC 52",16.0,"3x1,5",null,null,null,null,null,2,null],["i.DC 67",16.0,"3x1,5",null,null,null,null,null,2,null],["i.DC 84",16.0,"3x1,5",null,null,null,null,null,2,null],["i.DC 115",16.0,"3x1,5",null,null,null,null,null,2,null],["i.DC 140",16.0,"3x1,5",null,null,null,null,null,2,null],["i.DC 175",16.0,"3x1,5",null,null,null,null,null,2,null],["i.DC 225",16.0,"3x1,5",null,null,null,null,null,2,null],["i.DC 275",16.0,"3x1,5",null,null,null,null,null,2,null],["i.DC 330",16.0,"3x1,5",null,null,null,null,null,2,null],["i.DC 395",16.0,"3x1,5",null,null,null,null,null,2,null],["i.DC 450",16.0,"3x1,5",null,null,null,null,null,2,null],["i.DC 610",16.0,"3x1,5",null,null,null,null,null,2,null],["i.DC 870",16.0,"3x1,5",null,null,null,null,null,2,null],["i.DC 1190",16.0,"3x1,5",null,null,null,null,null,2,null],["i.DC 1555",16.0,"3x1,5",null,null,null,null,null,2,null]],"t":["Sami AZZABI","Eliott Baligan","Steven BERANGER","Fabrice BILLIARD","Patrick BOISGROLLIER","Jeremy Bret","Didier CARROCCI","Michel Dussourd","Nicolas ERNST","Anthony Fraleu","Raphael FRANCOIS","Antony GERARD","Alexandre Goulette","Sullivan Henrick","Virgile LEVAIRE","Allan LINGIBE","Joaquim LOPES","Willy MAGAUD","Patrick MARITANO","Guillaume MEYER","Abbes NASREDDINE","Benjamin Roux","Frédéric Schaller","David SOULE","Manser Stéphane","Mihretab TESFAMARIAM","Mickael THELIER","Yannick VIGNON"]};</script>
+<script>
+/* ===================== stockage ===================== */
+const Store = (() => {
+  const mem = {};
+  const has = typeof window !== 'undefined' && window.storage && typeof window.storage.get === 'function';
+  return {
+    async get(k){
+      if (has){ try { const r = await window.storage.get(k); return r ? r.value : null; } catch(e){ return null; } }
+      try { return localStorage.getItem(k); } catch(e){ return mem[k] ?? null; }
+    },
+    async set(k,v){
+      if (has){ try { await window.storage.set(k,v); return true; } catch(e){ return false; } }
+      try { localStorage.setItem(k,v); return true; } catch(e){ mem[k]=v; return true; }
+    }
+  };
+})();
+
+/* ===================== catalogue (base figée + copie de travail) ===================== */
+const BASE = JSON.parse(JSON.stringify(CATALOGUE));
+let CAT = JSON.parse(JSON.stringify(CATALOGUE));
+const COLS = [
+  ['modele','Modèle','text',0],
+  ['famille','Famille','fam',9],
+  ['gamme','Gamme','gam',8],
+  ['protection','Fusible gG (A)','num',1],
+  ['cable','Câble (mm²)','text',2],
+  ['gaine','Section gaine (m²)','num',3],
+  ['airFrais','Entrée d\'air (m²)','num',4],
+  ['debitExtracteur','Extracteur (m³/h)','num',5],
+  ['debitGainage','Gainage (m³/h)','num',6],
+  ['debitSansGainage','Extraction forcée (m³/h)','num',7],
+  ['cableAlt','Câble variante','text',10]
+];
+
+/* ===================== listes ===================== */
+const NEUTRE = ['TT','TN','TNS','TNC','IT','ND'];
+const GRILLES = [
+  ['A ventelles', null],
+  ['Grillagée à 40%', 0.40], ['Grillagée à 60%', 0.60], ['Grillagée à 80%', 0.80],
+  ['Poinçonnée à 40%', 0.40], ['Poinçonnée à 60%', 0.60], ['Poinçonnée à 80%', 0.80],
+  ['Ouverture libre', 1.00]
+];
+const LIAISONS = ['Présence flexible de liaison', 'Présence compensateur axial'];
+const VIT_MOTEUR = ['Vitesse moteur < 5 s', 'Vitesse moteur > 5 s'];
+const CLAPETS = [
+  'Volet de surpression en sortie refoulement air chaud',
+  'Registre motorisé en sortie refoulement air chaud',
+  'Pas de clapet anti-retour air chaud'
+];
+const REFOULEMENT = ['Volet de surpression en sortie refoulement air chaud', 'Registre motorisé en sortie refoulement air chaud'];
+const RECYCLAGE = ['Dans le local + Extérieur', 'Dans le local + Atelier + extérieur'];
+const V_MAX_GAINE = 6;
+
+const TABS = [
+  ['station','Station'],
+  ['machines','Machines'],
+  ['air','Bilan aéraulique'],
+  ['racc','Raccordements'],
+  ['rapport','Rapport']
+];
+
+/* ===================== état ===================== */
+const blank = () => ({
+  s_client:'', s_cs:'', s_date:new Date().toISOString().slice(0,10), s_tech:'',
+  s_tamb:'', s_horsgel:'', s_utri:'', s_umono:'', s_neutre:'',
+  c_gainee:'', c_gaineMes:'', c_collectrice:'', c_clapet:'', c_vitmoteur:'', c_recyclage:'', c_recyclagedest:'',
+  c_ckBornes:false, c_ckPhases:false, c_ckVent:false, c_ckT11:false,
+  s_surfmes:'', s_grille:'', s_coef:'', s_remarques:'', s_observations:'', s_prononcee:'',
+  r_liaison:'', r_liaisonok:'', r_compensateur:'', r_vanne:'', r_huile:'', r_niveau:'',
+  r_collecteur:'', r_diamcoll:'', r_pente:'',
+  r_diampurg:'', r_colcygne:'', r_hauteur:'',
+  machines: []
+});
+let S = blank();
+let TAB = 'station';
+let seq = 1;
+
+const newMachine = () => ({
+  id: 'M' + (seq++), gamme: CAT.g[0], modele:'', reference:'', serie:'', emr:'',
+  protType:'', protMarque:'', protTaille:'', protClasse:'', protCourbe:'', protDdrSens:'', protDdrType:'',
+  cableMat:'', cableUtil:'', relaisPr:'', relaisVent:'',
+  ckBornes:false, ckPhases:false, ckVent:false, ckT11:false,
+  p210:'', tensT11:'', gainee:'', collectrice:'', recyclage:'', recyclagedest:'',
+  gaineMes:'', nbExtr:'', extr1:'', extr2:'', extr3:'', extr4:'', extr5:'',
+  eauDebit:'', eauTe:'', eauTs:'', ptgDebit:'', ptgTe:'', ptgTs:''
+});
+
+/* ===================== utilitaires ===================== */
+const $ = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const num = v => { if (v === '' || v === null || v === undefined) return null; const n = parseFloat(String(v).replace(',','.')); return isNaN(n) ? null : n; };
+const fmt = (v, d=2) => v === null || v === undefined || v === '' ? '—' : Number(v).toLocaleString('fr-FR',{maximumFractionDigits:d});
+const firstNum = s => { const m = String(s ?? '').match(/[\d]+(?:[.,]\d+)?/); return m ? parseFloat(m[0].replace(',','.')) : null; };
+const cableSect = s => { const m = String(s ?? '').match(/x\s*([\d]+(?:[.,]\d+)?)/i); return m ? parseFloat(m[1].replace(',','.')) : null; };
+
+function specOf(modele){
+  if (!modele) return null;
+  const r = CAT.m.find(x => x[0] === modele);
+  if (!r) return null;
+  return { modele:r[0], protection:r[1], cable:r[2], gaine:r[3], airFrais:r[4],
+           debitExtracteur:r[5], debitGainage:r[6], debitSansGainage:r[7],
+           gamme:CAT.g[r[8]], famille:CAT.f[r[9]] ?? '', cableAlt:r[10] || null };
+}
+const isEau = m => /\bW\b/.test(m.modele || '');
+const isSFC = m => /SFC/i.test(m.modele || '');
+const isSecheur = m => /s[ée]cheur/i.test(m.gamme || '');
+/* sécheur par adsorption : ni section de gaine ni bilan aéraulique */
+const isAdsorption = m => /adsorption/i.test(m.gamme || '');
+/* version T : compresseur avec sécheur intégré, seul cas où un extracteur est relevé */
+const isVersionT = m => /(\bT\b|\d\s*T\b)/.test(m.modele || '');
+
+/* ===================== conformité de la protection électrique =====================
+   - compresseur SFC (vitesse variable) : fusible gG, ou disjoncteur courbe B + différentiel 300 mA type SI
+   - compresseur (autre)                : fusible gG, ou disjoncteur courbe D
+   - sécheur                            : fusible gG, ou disjoncteur courbe C                                */
+const courbeRequise = m => isSFC(m) ? 'B' : (isSecheur(m) ? 'C' : 'D');
+const norm = v => String(v ?? '').trim().toUpperCase().replace(/\s+/g,'');
+/* classe (fusible) ou courbe (disjoncteur) installée, comparée à l'exigence */
+function courbeConformite(m){
+  const req = courbeRequise(m);
+  if (m.protType === 'Fusible'){
+    if (!m.protClasse) return { sev:'warn', txt:'Classe du fusible non relevée.' };
+    return norm(m.protClasse) === 'GG'
+      ? { sev:'ok', txt:'Classe Gg : conforme.' }
+      : { sev:'bad', txt:`Classe ${esc(m.protClasse)} : classe Gg requise.` };
+  }
+  if (m.protType === 'Disjoncteur'){
+    if (!m.protCourbe) return { sev:'warn', txt:`Courbe non relevée (courbe ${req} requise).` };
+    return norm(m.protCourbe) === req
+      ? { sev:'ok', txt:`Courbe ${req} : conforme.` }
+      : { sev:'bad', txt:`Courbe ${esc(m.protCourbe)} : courbe ${req} requise.` };
+  }
+  return null;
+}
+/* différentiel DDR : exigé uniquement pour un disjoncteur sur compresseur SFC */
+function ddrConformite(m){
+  if (m.protType !== 'Disjoncteur' || !isSFC(m)) return null;
+  if (!m.protDdrSens && !m.protDdrType) return { sev:'warn', txt:'Différentiel DDR non relevé (300 mA type SI requis en vitesse variable).' };
+  const sensOk = num(m.protDdrSens) === 300, typeOk = norm(m.protDdrType) === 'SI';
+  return (sensOk && typeOk)
+    ? { sev:'ok', txt:'Différentiel 300 mA type SI : conforme.' }
+    : { sev:'bad', txt:`Différentiel ${m.protDdrSens?fmt(num(m.protDdrSens),0)+' mA':'—'} type ${esc(m.protDdrType||'—')} : 300 mA type SI requis.` };
+}
+/* verdict global, utilisé pour la liste des points à lever */
+function protConformite(m){
+  if (!m.modele) return null;
+  if (!m.protType) return { sev:'warn', txt:'Type de protection (fusible / disjoncteur) non renseigné.' };
+  const c = courbeConformite(m), d = ddrConformite(m);
+  if (c && c.sev !== 'ok') return c;
+  if (d && d.sev !== 'ok') return d;
+  return { sev:'ok', txt: d ? 'Protection électrique conforme (courbe et différentiel).' : 'Protection électrique conforme.' };
+}
+/* extracteurs relevés : machine non gainée, ou version T dont le sécheur intégré doit être ventilé */
+const extracteurRelevable = m => !isSecheur(m) && !!m.modele && (gaineeDe(m) === 'Non' || isVersionT(m));
+const debitExtrRequis = m => { const sp = specOf(m.modele); if (!sp) return null;
+  return gaineeDe(m) === 'Oui' ? sp.debitExtracteur : sp.debitSansGainage; };
+const nbExtr = m => { const v = parseInt(m.nbExtr, 10); return isNaN(v) ? 1 : Math.min(5, Math.max(0, v)); };
+const totalExtr = m => { let t = null;
+  for (let i = 1; i <= nbExtr(m); i++){ const v = num(m['extr'+i]); if (v !== null) t = (t || 0) + v; }
+  return t; };
+/* contrôles avant mise sous tension : les deux derniers ne concernent pas les sécheurs */
+const CONTROLES = [
+  ['ckBornes','Fixation des vis de la boîte à bornes', true],
+  ['ckPhases','Ordre des phases', true],
+  ['ckVent','Sens de rotation du moto-ventilateur', false],
+  ['ckT11','Réglage du transformateur T11', false]
+];
+/* ordre des phases : sur les sécheurs, uniquement le frigorifique à partir de la gamme TE */
+const ordrePhases = m => {
+  if (!isSecheur(m)) return true;
+  if (/adsorption/i.test(m.gamme || '')) return false;
+  const g = String(m.modele || '').trim().match(/^T([A-Z])/i);
+  return !!g && g[1].toUpperCase() >= 'E';
+};
+const controlesDe = m => CONTROLES.filter(([k,, pourSecheur]) => {
+  if (k === 'ckPhases') return ordrePhases(m);
+  return pourSecheur || !isSecheur(m);
+});
+/* gainage déclaré machine par machine : compresseurs à vis et sécheurs frigorifiques TG et au-delà */
+const secheurGainable = m => {
+  if (/adsorption/i.test(m.gamme || '')) return false;
+  const g = String(m.modele || '').trim().match(/^T([A-Z])/i);
+  return !!g && g[1].toUpperCase() >= 'G';
+};
+const gainable = m => !!m.modele && (isSecheur(m) ? secheurGainable(m) : true);
+/* relais thermique moto-ventilateur : à partir de la gamme ASK, pas sur les petites machines */
+const SANS_RELAIS_VENT = ['SXC','SX','SK','SM'];
+const relaisVentilateur = m => {
+  if (isSecheur(m) || !m.modele) return false;
+  const p = String(m.modele).trim().toUpperCase().match(/^[A-Z]+/);
+  return !p || !SANS_RELAIS_VENT.includes(p[0]);
+};
+/* les compresseurs à vis partagent un réglage de gainage et une check-list */
+const GROUPE_COMMUN = 'Compresseur à vis';
+const enCommun = m => m.gamme === GROUPE_COMMUN;
+const gaineeDe = m => enCommun(m) ? S.c_gainee : m.gainee;
+const collectriceDe = m => enCommun(m) ? S.c_collectrice : m.collectrice;
+const sectionDe = m => m.gaineMes;   /* section du conduit propre à la machine */
+const recyclageDe = m => enCommun(m) ? S.c_recyclage : m.recyclage;
+const controleDe = (m,k) => enCommun(m) ? S['c_'+k] : m[k];
+const gaineDeclaree = m => gainable(m) && gaineeDe(m) === 'Oui';
+const LIB_CTRL = { ckBornes:'serrage boîte à bornes', ckPhases:'ordre des phases',
+                   ckVent:'sens de rotation moto-ventilateur', ckT11:'réglage transformateur T11' };
+
+/* ===================== moteur de contrôle ===================== */
+function analyse(){
+  const F = [];
+  const add = (sev, tab, txt, where) => F.push({sev, tab, txt, where});
+
+  /* --- aéraulique : bilans distincts compresseurs / sécheurs, entrée d'air commune --- */
+  /* les sécheurs par adsorption sont hors bilan : ni section de gaine, ni entrée d'air */
+  let surfReq = 0;
+  S.machines.forEach(m => { const sp = specOf(m.modele); if (sp && !isAdsorption(m) && sp.airFrais) surfReq += sp.airFrais; });
+  const GROUPES_AIR = [
+    { cle:'comp', nom:'Compresseurs à vis',     test:m => !isSecheur(m) },
+    { cle:'sech', nom:'Sécheurs frigorifiques', test:m => isSecheur(m) && !isAdsorption(m) }
+  ];
+  const groupes = GROUPES_AIR.map(g => {
+    const liste = S.machines.filter(m => specOf(m.modele) && g.test(m));
+    const conduits = [], coll = { debit:0, section:null, noms:[] };
+    let debitGaine = 0, sectReq = 0;
+    liste.forEach(m => {
+      const sp = specOf(m.modele);
+      if (!gaineDeclaree(m)) return;
+      const q = sp.debitGainage || 0, sec = num(sectionDe(m));
+      if (sp.gaine) sectReq += sp.gaine;
+      if (q) debitGaine += q;
+      conduits.push({ nom:sp.modele, debit:q, section:sec });
+      if (collectriceDe(m) === 'Oui'){
+        coll.debit += q; coll.noms.push(sp.modele);
+        if (sec) coll.section = Math.max(coll.section || 0, sec);
+      }
+    });
+    /* le collecteur reprend le débit cumulé des machines du groupe qui s'y raccordent */
+    if (coll.noms.length)
+      conduits.push({ nom:`Gaine collectrice ${g.cle === 'comp' ? 'compresseurs' : 'sécheurs'} — ${coll.noms.length} machine${coll.noms.length>1?'s':''}`,
+                      debit:coll.debit,
+                      section:(g.cle === 'comp' ? num(S.c_gaineMes) : null) || coll.section,
+                      collective:true });
+    conduits.forEach(c => c.v = (c.section && c.debit) ? (c.debit / c.section) / 3600 : null);
+    /* la vitesse de référence est celle de la gaine collectrice ; à défaut, le conduit le plus chargé */
+    const collecteur = conduits.find(c => c.collective) || null;
+    const vitesse = (collecteur && collecteur.v !== null) ? collecteur.v
+      : conduits.reduce((x,c) => c.v !== null && (x === null || c.v > x) ? c.v : x, null);
+    return { cle:g.cle, nom:g.nom, liste, conduits, collecteur, vitesse, debitGaine, sectReq };
+  });
+  const conduits = groupes.reduce((t,g) => t.concat(g.conduits), []);
+  const debitGaine = groupes.reduce((t,g) => t + g.debitGaine, 0);
+  const coef = num(S.s_coef);
+  const surfMes = num(S.s_surfmes);
+  const surfLibre = (surfMes !== null && coef !== null) ? surfMes * coef : null;
+
+  /* --- chantier --- */
+  if (!S.s_client) add('warn','station','Nom du client non renseigné.');
+  if (!S.s_tech) add('warn','rapport','Technicien non renseigné.');
+  if (S.s_horsgel === 'Non') add('bad','station','Local non hors gel : risque de gel des condensats et du réseau.');
+  const utri = num(S.s_utri);
+  if (utri !== null && (utri < 360 || utri > 440)) add('bad','station',`Tension triphasée relevée à ${fmt(utri,0)} V, hors plage 400 V ±10 %.`);
+  const umono = num(S.s_umono);
+  if (umono !== null && (umono < 207 || umono > 253)) add('warn','station',`Tension monophasée relevée à ${fmt(umono,0)} V, hors plage 230 V ±10 %.`);
+  if (!S.s_neutre) add('warn','station','Régime de neutre non identifié.');
+
+  /* --- machines --- */
+  if (!S.machines.length) add('bad','machines','Aucune machine déclarée.');
+  S.machines.forEach((m,i) => {
+    const tag = m.modele || `Machine ${i+1}`;
+    const sp = specOf(m.modele);
+    if (!m.modele){ add('bad','machines','Modèle non sélectionné.', `Machine ${i+1}`); return; }
+    if (!m.serie) add('warn','machines','Numéro de série non relevé.', tag);
+    if (!m.emr) add('warn','machines','EMR non relevé.', tag);
+
+    const cu = cableSect(m.cableUtil), cp = sp ? cableSect(sp.cable) : null;
+    if (!m.cableUtil) add('warn','machines','Section de câble posée non relevée.', tag);
+    else if (!m.cableMat) add('warn','machines','Matière du câble (cuivre / alu) non renseignée.', tag);
+    else if (m.cableMat === 'Cuivre' && cu !== null && cp !== null && cu < cp)
+      add('bad','machines',`Câble posé en ${esc(m.cableUtil)} contre ${esc(sp.cable)} préconisé : section insuffisante.`, tag);
+
+    const pu = firstNum(m.protTaille), pp = sp ? sp.protection : null;
+    if (!m.protType && !m.protMarque && !m.protTaille) add('warn','machines','Protection installée non relevée.', tag);
+    else {
+      if (!m.protTaille) add('warn','machines','Taille de la protection installée non relevée.', tag);
+      else if (pu !== null && pp !== null && pu !== pp)
+        add('bad','machines',`Protection calibrée à ${fmt(pu,0)} A pour ${fmt(pp,0)} A recommandés : la taille doit être égale à la valeur préconisée.`, tag);
+      const pc = protConformite(m);
+      if (pc && pc.sev !== 'ok') add(pc.sev, 'machines', pc.txt, tag);
+    }
+
+    if (!enCommun(m)){
+      const miss = controlesDe(m).filter(c => !m[c[0]]).map(c => LIB_CTRL[c[0]]);
+      if (miss.length) add('bad','machines',`Contrôles électriques non validés : ${miss.join(', ')}.`, tag);
+    }
+
+    if (!isSecheur(m)){
+      const t11 = num(m.tensT11);
+      if (t11 === null) add('warn','machines','Tension secondaire T11 non mesurée.', tag);
+      else if (t11 < 207 || t11 > 253) add('bad','machines',`Secondaire T11 à ${fmt(t11,0)} V, hors plage 230 V ±10 %.`, tag);
+    }
+
+    if (gainable(m) && !gaineeDe(m) && !enCommun(m)) add('warn','air','Gainage de la machine non renseigné.', tag);
+    if (gaineDeclaree(m)){
+      const gm = num(sectionDe(m));
+      if (gm === null) add('warn','air','Section de gaine non mesurée.', tag);
+      else if (gm !== null && sp && sp.gaine && gm < sp.gaine)
+        add('bad','air',`Gaine mesurée à ${fmt(gm)} m² pour ${fmt(sp.gaine)} m² préconisés.`, tag);
+      if (!enCommun(m) && m.recyclage === 'Oui' && !m.recyclagedest) add('warn','air','Destination du recyclage d\'air chaud non précisée.', tag);
+    }
+    if (extracteurRelevable(m)){
+      const req = debitExtrRequis(m), tot = totalExtr(m);
+      if (nbExtr(m) === 0){
+        if (req) add('warn','air',`Aucun extracteur déclaré alors que ${fmt(req,0)} m³/h doivent être évacués.`, tag);
+      }
+      else if (tot === null) add('warn','air','Débit des extracteurs non relevé.', tag);
+      else if (req && tot < req)
+        add('bad','air',`Extraction relevée à ${fmt(tot,0)} m³/h pour ${fmt(req,0)} m³/h requis.`, tag);
+    }
+    if (isEau(m) && num(m.eauDebit) === null) add('warn','machines','Machine refroidie par eau : débit d\'eau non relevé.', tag);
+  });
+
+  /* --- réglages communs au groupe compresseurs --- */
+  const comps = S.machines.filter(m => enCommun(m) && m.modele);
+  if (comps.length){
+    const ou = `Compresseurs à vis (${comps.length})`;
+    const miss = CONTROLES.filter(([k]) => !S['c_'+k]).map(([k]) => LIB_CTRL[k]);
+    if (miss.length) add('bad','machines',`Contrôles électriques non validés : ${miss.join(', ')}.`, ou);
+    if (!S.c_gainee) add('warn','air','Gainage des compresseurs non renseigné.', ou);
+    if (S.c_gainee === 'Oui'){
+      if (!S.c_collectrice) add('warn','air','Gaine collectrice non renseignée.', ou);
+      if (S.c_collectrice === 'Oui'){
+        if (num(S.c_gaineMes) === null) add('warn','air','Section de gaine collectrice non mesurée.', ou);
+        if (!S.c_clapet) add('warn','air','Sortie de refoulement d\'air chaud non précisée.', ou);
+        else if (/Registre motorisé/i.test(S.c_clapet) && !S.c_vitmoteur)
+          add('warn','air','Vitesse de montée du registre motorisé non précisée.', ou);
+      }
+      if (S.c_recyclage === 'Oui' && !S.c_recyclagedest) add('warn','air','Destination du recyclage d\'air chaud non précisée.', ou);
+    }
+  }
+
+  /* --- verdicts aérauliques, conduit par conduit --- */
+  conduits.forEach(c => {
+    if (c.v === null) return;
+    if (c.v > V_MAX_GAINE) add('bad','air',`Vitesse d'air de ${fmt(c.v,1)} m/s, au-delà des ${V_MAX_GAINE} m/s admis.`, c.nom);
+    else if (c.v > V_MAX_GAINE * 0.85) add('warn','air',`Vitesse d'air de ${fmt(c.v,1)} m/s : marge faible sous la limite de ${V_MAX_GAINE} m/s.`, c.nom);
+  });
+  if (surfReq > 0){
+    if (surfLibre === null) add('warn','air','Surface d\'entrée d\'air libre non caractérisée (surface mesurée ou coefficient de grille manquant).');
+    else if (surfLibre < surfReq) add('bad','air',`Entrée d'air libre de ${fmt(surfLibre)} m² pour ${fmt(surfReq)} m² exigés par les machines.`);
+  }
+
+  /* --- raccordements --- */
+  if (S.r_niveau === 'Non') add('bad','racc','Niveau d\'huile non vérifié avant démarrage.');
+  if (S.r_huile === 'Non') add('warn','racc','Appoint d\'huile et rotation du bloc non effectués au premier démarrage.');
+  if (S.r_vanne === 'Non') add('warn','racc','Vanne d\'isolement absente en sortie machine.');
+  if (S.r_liaisonok === 'Non') add('bad','racc','Liaison souple absente : contraintes mécaniques transmises au réseau.');
+  if (S.r_collecteur === 'Oui'){
+    if (S.r_pente === 'Non') add('bad','racc','Collecteur de condensat sans pente supérieure à 1 % vers le traitement.');
+    if (S.r_colcygne === 'Non') add('warn','racc','Col de cygne absent sur les points de purge.');
+    if (S.r_hauteur === 'Non') add('bad','racc','Conduite d\'évacuation du purgeur au-delà de 5 m de hauteur.');
+  }
+
+  const counts = { bad:F.filter(f=>f.sev==='bad').length, warn:F.filter(f=>f.sev==='warn').length };
+  return { F, counts, air:{ debitGaine, groupes, conduits, surfReq, surfMes, surfLibre, coef } };
+}
+
+/* ===================== rendu ===================== */
+function renderTabs(a){
+  const per = {};
+  a.F.forEach(f => { per[f.tab] = per[f.tab] || {bad:0,warn:0}; per[f.tab][f.sev]++; });
+  $('#tabs').innerHTML = TABS.map(([k,l],i) => {
+    const c = per[k] || {bad:0,warn:0};
+    const b = c.bad ? `<span class="badge">${c.bad}</span>` : (c.warn ? `<span class="badge warn">${c.warn}</span>` : '');
+    return `<button class="tab" role="tab" data-tab="${k}" aria-selected="${TAB===k}"><span class="num">${String(i+1).padStart(2,'0')}</span>${l}${b}</button>`;
+  }).join('');
+  $$('.tab').forEach(t => t.onclick = () => go(t.dataset.tab));
+  TABS.forEach(([k]) => $('#panel-'+k).classList.toggle('hidden', k !== TAB));
+}
+
+function renderVerdict(a){
+  const v = $('#verdict'), t = $('#verdictTxt');
+  let cls = 'ok', txt = 'Conforme';
+  if (!S.machines.length && !S.s_client) { cls='ok'; txt='À compléter'; }
+  else if (a.counts.bad) { cls='bad'; txt = a.counts.bad + ' point' + (a.counts.bad>1?'s':'') + ' bloquant' + (a.counts.bad>1?'s':''); }
+  else if (a.counts.warn) { cls='warn'; txt = a.counts.warn + ' réserve' + (a.counts.warn>1?'s':''); }
+  v.className = 'verdict ' + cls;
+  t.textContent = txt;
+  const c = [S.s_client, S.s_cs ? 'CS ' + S.s_cs : ''].filter(Boolean).join(' — ');
+  $('#chipClient').textContent = c || 'Aucun chantier ouvert';
+}
+
+function verrous(){
+  /* purge des saisies devenues sans objet sur chaque machine */
+  S.machines.forEach(m => {
+    if (!isSFC(m)) m.p210 = '';
+    if (m.protType !== 'Fusible') m.protClasse = '';
+    if (m.protType !== 'Disjoncteur') m.protCourbe = '';
+    if (m.protType !== 'Disjoncteur' || !isSFC(m)){ m.protDdrSens = ''; m.protDdrType = ''; }
+    if (!gainable(m) || enCommun(m)) m.gainee = '';
+    if (!gaineDeclaree(m)) m.gaineMes = '';
+    if (!gaineDeclaree(m) || enCommun(m)){ m.collectrice = ''; m.recyclage = ''; m.recyclagedest = ''; }
+    if (m.recyclage !== 'Oui') m.recyclagedest = '';
+    if (enCommun(m)){ m.ckBornes = m.ckPhases = m.ckVent = m.ckT11 = false; }
+    if (!relaisVentilateur(m)) m.relaisVent = '';
+    if (!extracteurRelevable(m)){ m.nbExtr = ''; for (let i=1;i<=5;i++) m['extr'+i] = ''; }
+    else for (let i = nbExtr(m)+1; i <= 5; i++) m['extr'+i] = '';
+    if (!ordrePhases(m)) m.ckPhases = false;
+    if (isSecheur(m)){ m.relaisPr = ''; m.relaisVent = ''; m.tensT11 = ''; m.ckVent = false; m.ckT11 = false;
+                       m.recyclage = ''; m.recyclagedest = ''; }
+    /* sécheur par adsorption : aucune donnée aéraulique */
+    if (isAdsorption(m)){ m.gainee = ''; m.gaineMes = ''; m.collectrice = ''; }
+  });
+  /* réglages communs aux compresseurs */
+  if (S.c_gainee !== 'Oui'){ S.c_gaineMes = ''; S.c_collectrice = ''; S.c_clapet = ''; S.c_recyclage = ''; S.c_recyclagedest = ''; }
+  if (S.c_collectrice !== 'Oui'){ S.c_gaineMes = ''; S.c_clapet = ''; }
+  if (!/Registre motorisé/i.test(S.c_clapet || '')) S.c_vitmoteur = '';
+  if (S.c_recyclage !== 'Oui') S.c_recyclagedest = '';
+}
+
+function renderStation(){
+  const m = $('#m_tamb'); const t = num(S.s_tamb);
+  m.className = 'msg'; m.textContent = '';
+  if (t !== null){
+    if (t < 3){ m.className='msg bad'; m.textContent='Sous 3 °C : risque de gel, prévoir un chauffage du local.'; }
+    else if (t > 40){ m.className='msg bad'; m.textContent='Au-delà de 40 °C : hors plage de fonctionnement usuelle.'; }
+    else { m.className='msg ok'; m.textContent='Dans la plage 3–40 °C.'; }
+  }
+  const mu = $('#m_utri'), u = num(S.s_utri);
+  mu.className='msg'; mu.textContent='';
+  if (u !== null){
+    const e = ((u-400)/400*100);
+    mu.className = 'msg ' + (Math.abs(e) > 10 ? 'bad' : 'ok');
+    mu.innerHTML = `Écart nominal <b>${e>0?'+':''}${fmt(e,1)} %</b> par rapport à 400 V.`;
+  }
+  const mm = $('#m_umono'), u2 = num(S.s_umono);
+  mm.className='msg'; mm.textContent='';
+  if (u2 !== null){
+    const e = ((u2-230)/230*100);
+    mm.className = 'msg ' + (Math.abs(e) > 10 ? 'warn' : 'ok');
+    mm.innerHTML = `Écart nominal <b>${e>0?'+':''}${fmt(e,1)} %</b> par rapport à 230 V.`;
+  }
+  const mc = $('#m_coef'), cf = num(S.s_coef), sm = num(S.s_surfmes);
+  mc.className='msg'; mc.textContent='';
+  if (cf !== null && sm !== null) { mc.className='msg'; mc.innerHTML = `Surface libre <b>${fmt(sm*cf)} m²</b>.`; }
+  else if (!S.s_grille) mc.textContent = 'Renseignez le type de grille pour préremplir.';
+}
+
+function machineCard(m, i, a){
+  const sp = specOf(m.modele);
+  const models = CAT.m.filter(r => CAT.g[r[8]] === m.gamme);
+  const fams = [];
+  models.forEach(r => { const f = CAT.f[r[9]]; if (!fams.includes(f)) fams.push(f); });
+  const opts = fams.map(f => `<optgroup label="${esc(f)}">` +
+      models.filter(r => CAT.f[r[9]] === f)
+            .map(r => `<option value="${esc(r[0])}"${r[0]===m.modele?' selected':''}>${esc(r[0])}</option>`).join('') +
+    `</optgroup>`).join('');
+
+  const mine = a.F.filter(f => f.where === (m.modele || `Machine ${i+1}`));
+  const st = mine.some(f=>f.sev==='bad') ? 'bad' : (mine.length ? 'warn' : 'ok');
+  const stTxt = st==='bad' ? 'à lever' : (st==='warn' ? 'réserves' : 'conforme');
+
+  const specBox = (label, val, unit, force, cls) => {
+    const vide = val === null || val === undefined || val === '';
+    if (vide) return (isSecheur(m) && !force) ? ''
+      : `<div class="f${cls?' '+cls:''}"><label><span class="lt">${label}</span></label><div class="spec empty"><span>hors catalogue</span><span class="tag">—</span></div></div>`;
+    return `<div class="f${cls?' '+cls:''}"><label><span class="lt">${label}</span></label><div class="spec"><span>${esc(typeof val === 'number' ? fmt(val) : val)}${unit?' '+unit:''}</span><span class="tag">catalogue</span></div></div>`;
+  };
+
+  const cmp = (mesure, ref, unit, senseLower) => {
+    const v = num(mesure);
+    if (v === null || ref === null || ref === undefined) return '';
+    const bad = senseLower ? v < ref : v > ref;
+    return `<div class="msg ${bad?'bad':'ok'}">${bad?'Écart à corriger':'Conforme'} — référence <b>${fmt(ref)}${unit?' '+unit:''}</b></div>`;
+  };
+
+  return `<div class="mrow" data-mid="${m.id}">
+    <div class="mhead">
+      <span class="n">${String(i+1).padStart(2,'0')}</span>
+      <span class="t ${m.modele?'':'void'}">${esc(m.modele || 'Modèle à sélectionner')}</span>
+      ${m.modele ? `<span class="cool ${isEau(m)?'eau':''}">${isEau(m)?'Refroidi par eau':'Refroidi par air'}</span>` : ''}
+      ${isSFC(m) ? '<span class="cool">SFC — vitesse variable</span>' : ''}
+      <span class="sp"></span>
+      ${m.modele ? `<span class="st ${st}">${stTxt}</span>` : ''}
+      <button class="x" data-del="${m.id}">Retirer</button>
+    </div>
+    <div class="mbody">
+      <div class="sect">Identification</div>
+      <div class="grid g4">
+        <div class="f"><label><span class="lt">Gamme</span></label><select data-m="${m.id}" data-k="gamme">${CAT.g.map(g=>`<option${g===m.gamme?' selected':''}>${esc(g)}</option>`).join('')}</select></div>
+        <div class="f"><label><span class="lt">Modèle</span></label><select data-m="${m.id}" data-k="modele"><option value="">— choisir —</option>${opts}</select></div>
+        <div class="f"><label><span class="lt">Référence</span></label><input data-m="${m.id}" data-k="reference" value="${esc(m.reference)}"></div>
+        <div class="f"><label><span class="lt">N° de série</span></label><input class="num" data-m="${m.id}" data-k="serie" value="${esc(m.serie)}"></div>
+        <div class="f"><label><span class="lt">EMR</span></label><input class="num" data-m="${m.id}" data-k="emr" value="${esc(m.emr)}"></div>
+      </div>
+
+      <div class="sect">Puissance et protection</div>
+      <div class="grid g4">
+        ${specBox('Câble cuivre préconisé <span class="u">mm² · 50 m maxi</span>', sp?sp.cable:null, null, false, 'span2')}
+        <div class="f"><label><span class="lt">Matière du câble</span></label><select data-m="${m.id}" data-k="cableMat">
+            <option value="">— choisir —</option>
+            <option value="Cuivre"${m.cableMat==='Cuivre'?' selected':''}>Cuivre</option>
+            <option value="Alu"${m.cableMat==='Alu'?' selected':''}>Alu</option>
+          </select></div>
+        <div class="f"><label><span class="lt">Câble posé <span class="u">mm²</span></span></label><input data-m="${m.id}" data-k="cableUtil" value="${esc(m.cableUtil)}" placeholder="4x70">${(() => {
+            if (m.cableMat === 'Alu') return `<div class="msg">Sous la responsabilité de l'électricien qui a effectué le calcul.</div>`;
+            if (m.cableMat === 'Cuivre') return cmp(cableSect(m.cableUtil), sp?cableSect(sp.cable):null, 'mm²', true);
+            return '';
+          })()}
+          ${sp && sp.cableAlt ? `<div class="msg">Variante catalogue : <b>${esc(sp.cableAlt)}</b></div>` : ''}</div>
+        ${specBox('Fusible <span class="keep-case">Gg</span> recommandé <span class="u">A</span>', sp?sp.protection:null)}
+        <div class="f span2"><label><span class="lt">Protection installée</span></label><div class="multi">
+            <select data-m="${m.id}" data-k="protType">
+              <option value="">Type</option>
+              <option value="Fusible"${m.protType==='Fusible'?' selected':''}>Fusible</option>
+              <option value="Disjoncteur"${m.protType==='Disjoncteur'?' selected':''}>Disjoncteur</option>
+            </select>
+            <input data-m="${m.id}" data-k="protMarque" value="${esc(m.protMarque)}" placeholder="Marque">
+            <input data-m="${m.id}" data-k="protTaille" value="${esc(m.protTaille)}" placeholder="Taille (A)">
+          </div>${(() => {
+            const v = firstNum(m.protTaille), ref = sp ? sp.protection : null;
+            if (v === null || ref === null) return '';
+            const ok = v === ref;
+            return `<div class="msg ${ok?'ok':'bad'}">${ok?'Conforme':'Écart à corriger'} — référence <b>${fmt(ref)} A</b></div>`;
+          })()}</div>
+        ${(() => {
+          const req = courbeRequise(m);
+          if (m.protType === 'Fusible'){
+            const cc = courbeConformite(m);
+            return `<div class="f"><label><span class="lt">Classe du fusible <span class="u"><span class="keep-case">Gg</span> requise</span></span></label><input data-m="${m.id}" data-k="protClasse" value="${esc(m.protClasse)}" placeholder="Gg">${cc?`<div class="msg ${cc.sev}">${cc.txt}</div>`:''}</div>`;
+          }
+          if (m.protType === 'Disjoncteur'){
+            const cc = courbeConformite(m);
+            return `<div class="f"><label><span class="lt">Courbe du disjoncteur <span class="u">${req} requise</span></span></label><input data-m="${m.id}" data-k="protCourbe" value="${esc(m.protCourbe)}" placeholder="${req}">${cc?`<div class="msg ${cc.sev}">${cc.txt}</div>`:''}</div>`;
+          }
+          return `<div class="f"><label><span class="lt">Classe / courbe</span></label><input disabled placeholder="Choisir le type de protection"><div class="msg lock">Sélectionnez fusible ou disjoncteur.</div></div>`;
+        })()}
+        ${m.protType === 'Disjoncteur' && isSFC(m) ? (() => {
+          const dc = ddrConformite(m);
+          return `<div class="f span2"><label><span class="lt">Différentiel (DDR) <span class="u">mA</span></span></label><input data-m="${m.id}" data-k="protDdrSens" value="${esc(m.protDdrSens)}" placeholder="300"></div>
+          <div class="f span2"><label><span class="lt">Type différentiel <span class="u">SI requis</span></span></label><input data-m="${m.id}" data-k="protDdrType" value="${esc(m.protDdrType)}" placeholder="SI">${dc?`<div class="msg ${dc.sev}">${dc.txt}</div>`:''}</div>`;
+        })() : ''}
+        ${isSecheur(m) ? '' : `
+        <div class="f"><label><span class="lt">Relais thermique moteur <span class="u">A</span></span></label><input type="number" step="0.1" data-m="${m.id}" data-k="relaisPr" value="${esc(m.relaisPr)}"></div>
+        ${relaisVentilateur(m) ? `<div class="f"><label><span class="lt">Relais thermique moto-ventilateur <span class="u">A</span></span></label><input type="number" step="0.1" data-m="${m.id}" data-k="relaisVent" value="${esc(m.relaisVent)}"></div>` : ''}
+        <div class="f"><label><span class="lt">Réglage P210</span></label><input data-m="${m.id}" data-k="p210" value="${esc(m.p210)}"${isSFC(m)?'':' disabled placeholder="SFC uniquement"'}>${isSFC(m)?'':'<div class="msg lock">Sans objet hors variation de vitesse.</div>'}</div>
+        <div class="f"><label><span class="lt">Secondaire T11 mesuré <span class="u">V</span></span></label><input type="number" step="1" data-m="${m.id}" data-k="tensT11" value="${esc(m.tensT11)}">${(()=>{const v=num(m.tensT11);return v===null?'':`<div class="msg ${(v<207||v>253)?'bad':'ok'}">${(v<207||v>253)?'Hors plage':'Dans la plage'} <b>207–253 V</b></div>`;})()}</div>`}
+      </div>
+
+      ${enCommun(m) ? '' : `<div class="sect">Contrôles avant mise sous tension</div>
+      <div class="checks">
+        ${controlesDe(m)
+          .map(([k,l])=>`<label class="chk"><input type="checkbox" data-m="${m.id}" data-k="${k}"${m[k]?' checked':''}><span>${l}</span><span class="state">${m[k]?'validé':'à faire'}</span></label>`).join('')}
+      </div>`}
+
+      ${enCommun(m) || isAdsorption(m) ? '' : (() => {
+        const seg2 = (k, oui, non) => `<select data-m="${m.id}" data-k="${k}">
+              <option value="">— choisir —</option>
+              <option value="Oui"${m[k]==='Oui'?' selected':''}>${oui||'Oui'}</option>
+              <option value="Non"${m[k]==='Non'?' selected':''}>${non||'Non'}</option>
+            </select>`;
+        const champ = (lbl, inner) => `<div class="f"><label><span class="lt">${lbl}</span></label>${inner}</div>`;
+
+        /* le gainage se déclare ici, machine par machine */
+        const bascule = gainable(m) ? champ('Gainée', seg2('gainee')) : '';
+        const forceGaine = isSecheur(m) && m.gainee === 'Oui';
+        /* le recyclage d'air chaud ne concerne pas les sécheurs */
+        const recyclage = isSecheur(m) ? ''
+          : champ('Gaine recyclage air chaud', seg2('recyclage'))
+            + champ('Destination du recyclage',
+                `<select data-m="${m.id}" data-k="recyclagedest"${m.recyclage==='Oui'?'':' disabled'}>
+                  <option value="">${m.recyclage==='Oui'?'— choisir —':'sans objet'}</option>
+                  ${RECYCLAGE.map(o=>`<option${o===m.recyclagedest?' selected':''}>${esc(o)}</option>`).join('')}
+                </select>`);
+        const gaine = gaineDeclaree(m)
+          ? specBox('Section de gaine préconisée <span class="u">m²</span>', sp?sp.gaine:null, null, forceGaine)
+            + (isSecheur(m) && !(sp && sp.gaine) && !forceGaine ? ''
+              : champ('Section de gaine mesurée <span class="u">m²</span>',
+                  `<input type="number" step="0.01" data-m="${m.id}" data-k="gaineMes" value="${esc(m.gaineMes)}">${cmp(m.gaineMes, sp?sp.gaine:null, 'm²', true)}`))
+            + champ('Gaine collectrice', seg2('collectrice'))
+            + recyclage
+          : '';
+        const sansGaine = m.gainee === 'Oui' ? ''
+          : specBox('Sans gainage, extraction forcée <span class="u">m³/h à 100 Pa</span>', sp?sp.debitSansGainage:null);
+        const aero = bascule + gaine + sansGaine
+          + specBox('Débit à évacuer par extracteur <span class="u">m³/h</span>', sp?sp.debitExtracteur:null)
+          + (m.gainee === 'Oui' && !isSecheur(m) ? specBox('Air chaud récupérable par gainage <span class="u">m³/h</span>', sp?sp.debitGainage:null) : '')
+          + specBox('Surface d\'entrée d\'air exigée <span class="u">m²</span>', sp?sp.airFrais:null);
+        return aero.trim() ? `<div class="sect">Aéraulique</div><div class="grid g4">${aero}</div>` : '';
+      })()}
+
+      ${isEau(m) ? `<div class="sect">Circuit d'eau de refroidissement</div>
+      <div class="grid g3">
+        <div class="f"><label><span class="lt">Débit d'eau mesuré <span class="u">m³/h</span></span></label><input type="number" step="0.1" data-m="${m.id}" data-k="eauDebit" value="${esc(m.eauDebit)}"></div>
+        <div class="f"><label><span class="lt">Température entrée <span class="u">°C</span></span></label><input type="number" step="0.5" data-m="${m.id}" data-k="eauTe" value="${esc(m.eauTe)}"></div>
+        <div class="f"><label><span class="lt">Température sortie <span class="u">°C</span></span></label><input type="number" step="0.5" data-m="${m.id}" data-k="eauTs" value="${esc(m.eauTs)}">${(()=>{const a=num(m.eauTe),b=num(m.eauTs);return (a!==null&&b!==null)?`<div class="msg">Élévation <b>${fmt(b-a,1)} K</b></div>`:'';})()}</div>
+        <div class="f"><label><span class="lt">Débit d'eau PTG <span class="u">m³/h</span></span></label><input type="number" step="0.1" data-m="${m.id}" data-k="ptgDebit" value="${esc(m.ptgDebit)}"></div>
+        <div class="f"><label><span class="lt">Température entrée PTG <span class="u">°C</span></span></label><input type="number" step="0.5" data-m="${m.id}" data-k="ptgTe" value="${esc(m.ptgTe)}"></div>
+        <div class="f"><label><span class="lt">Température sortie PTG <span class="u">°C</span></span></label><input type="number" step="0.5" data-m="${m.id}" data-k="ptgTs" value="${esc(m.ptgTs)}">${(()=>{const a=num(m.ptgTe),b=num(m.ptgTs);return (a!==null&&b!==null)?`<div class="msg">Élévation <b>${fmt(b-a,1)} K</b></div>`:'';})()}</div>
+      </div>` : ''}
+    </div>
+  </div>`;
+}
+
+/* ===================== bloc commun au groupe compresseurs ===================== */
+function blocCommun(a, liste){
+  const seg = k => `<select data-c="c_${k}">
+      <option value="">— choisir —</option>
+      <option value="Oui"${S['c_'+k]==='Oui'?' selected':''}>Oui</option>
+      <option value="Non"${S['c_'+k]==='Non'?' selected':''}>Non</option>
+    </select>`;
+  const champ = (lbl, inner, msg) => `<div class="f"><label><span class="lt">${lbl}</span></label>${inner}${msg||''}</div>`;
+
+  const checks = CONTROLES.map(([k,l]) =>
+    `<label class="chk"><input type="checkbox" data-c="c_${k}"${S['c_'+k]?' checked':''}><span>${l}</span><span class="state">${S['c_'+k]?'validé':'à faire'}</span></label>`
+  ).join('');
+
+  const gaine = S.c_gainee === 'Oui';
+  const collect = S.c_collectrice === 'Oui';
+
+  /* rangée 1 : gainage et collecteur — rangée 2 : recyclage et refoulement */
+  const rang1 = champ('Gainée', seg('gainee'))
+    + (gaine
+      ? champ('Section de gaine collectrice <span class="u">m²</span>',
+          `<input type="number" step="0.01" data-c="c_gaineMes" value="${esc(S.c_gaineMes)}"${collect?'':' disabled placeholder="sans objet"'}>`,
+          collect ? '' : '<div class="msg lock">Sans gaine collectrice, il n\'y a pas de section commune.</div>')
+        + champ('Gaine collectrice', seg('collectrice'))
+      : '');
+  const rang2 = gaine
+    ? champ('Gaine recyclage air chaud', seg('recyclage'))
+      + champ('Destination du recyclage',
+          `<select data-c="c_recyclagedest"${S.c_recyclage==='Oui'?'':' disabled'}>
+            <option value="">${S.c_recyclage==='Oui'?'— choisir —':'sans objet'}</option>
+            ${RECYCLAGE.map(o=>`<option${o===S.c_recyclagedest?' selected':''}>${esc(o)}</option>`).join('')}
+          </select>`)
+      + (collect ? champ('Sortie refoulement air chaud',
+          `<select data-c="c_clapet">
+            <option value="">— choisir —</option>
+            ${CLAPETS.map(o=>`<option${o===S.c_clapet?' selected':''}>${esc(o)}</option>`).join('')}
+          </select>`) : '')
+      + (collect && /Registre motorisé/i.test(S.c_clapet || '') ? champ('Vitesse de montée du registre',
+          `<select data-c="c_vitmoteur">
+            <option value="">— choisir —</option>
+            ${VIT_MOTEUR.map(o=>`<option${o===S.c_vitmoteur?' selected':''}>${esc(o)}</option>`).join('')}
+          </select>`) : '')
+    : '';
+
+  const relevable = false;
+  const lignes = liste.map(({m,i}) => {
+    const sp = specOf(m.modele);
+    if (!sp) return `<tr><td>Machine ${i+1}</td><td colspan="${5+(gaine?1:0)+(relevable?1:0)}" style="color:var(--ink-3)">modèle non sélectionné</td></tr>`;
+    const mesure = gaine
+      ? `<td class="n"><input type="number" step="0.01" data-m="${m.id}" data-k="gaineMes" value="${esc(m.gaineMes)}">${
+          (() => { const v = num(m.gaineMes); return (v === null || !sp.gaine) ? ''
+            : `<div class="msg ${v < sp.gaine ? 'bad':'ok'}" style="justify-content:flex-end">${v < sp.gaine ? 'insuffisante':'conforme'}</div>`; })()
+        }</td>`
+      : '';
+    const releve = '';
+    return `<tr><td>${esc(sp.modele)}</td>
+      <td class="n">${fmt(sp.gaine)}</td>
+      <td class="n">${fmt(sp.debitExtracteur,0)}</td>
+      <td class="n">${fmt(gaine ? sp.debitGainage : sp.debitSansGainage, 0)}</td>${mesure}
+      <td class="n">${fmt(sp.airFrais)}</td>${releve}</tr>`;
+  }).join('');
+
+  return `<div class="common">
+    <h4>Contrôles avant mise sous tension <span class="hint">commun aux ${liste.length} compresseur${liste.length>1?'s':''}</span></h4>
+    <div class="common-body" style="padding:0"><div class="checks" style="border:none">${checks}</div></div>
+  </div>
+  <div class="common">
+    <h4>Aéraulique <span class="hint">commun aux ${liste.length} compresseur${liste.length>1?'s':''}</span></h4>
+    <div class="common-body">
+      <div class="grid g3">${rang1}</div>
+      ${rang2 ? `<div class="grid g3" style="margin-top:12px">${rang2}</div>` : ''}
+      ${(() => {
+        const conc = liste.filter(({m}) => extracteurRelevable(m));
+        if (!conc.length) return '';
+        return `<div class="sect" style="margin-top:20px">Extracteurs</div>
+        <div class="tblwrap"><table class="tbl">
+          <thead><tr><th>Machine</th><th>Débit requis (m³/h)</th><th>Nombre d'extracteurs</th><th>Débit d'air par extracteur (m³/h)</th><th>Total relevé (m³/h)</th></tr></thead>
+          <tbody>${conc.map(({m}) => {
+            const req = debitExtrRequis(m), tot = totalExtr(m), n = nbExtr(m);
+            const champs = n === 0
+              ? '<input type="number" disabled placeholder="aucun extracteur">'
+              : Array.from({length:n}, (_,k) =>
+                  `<input type="number" step="10" data-m="${m.id}" data-k="extr${k+1}" value="${esc(m['extr'+(k+1)])}" title="Extracteur ${k+1}" placeholder="n°${k+1}">`).join(' ');
+            const verdict = n === 0
+              ? '<div class="msg lock" style="justify-content:flex-end">aucun extracteur</div>'
+              : (tot === null || !req) ? '' :
+              `<div class="msg ${tot < req ? 'bad':'ok'}" style="justify-content:flex-end">${tot < req ? 'insuffisant':'conforme'}</div>`;
+            return `<tr><td>${esc(m.modele)}${isVersionT(m) && gaineeDe(m)==='Oui' ? '<br><span style="color:var(--ink-3);font-size:11px">version T, sécheur intégré</span>' : ''}</td>
+              <td class="n">${fmt(req,0)}</td>
+              <td class="n"><select data-m="${m.id}" data-k="nbExtr" style="width:70px">${[0,1,2,3,4,5].map(v=>`<option value="${v}"${v===n?' selected':''}>${v}</option>`).join('')}</select></td>
+              <td><div style="display:flex;gap:6px;flex-wrap:wrap">${champs}</div></td>
+              <td class="n">${tot===null?'—':fmt(tot,0)}${verdict}</td></tr>`;
+          }).join('')}</tbody>
+        </table></div>`;
+      })()}
+      <div class="tblwrap"><table class="tbl">
+        <thead><tr><th>Machine</th><th>Section gaine préconisée (m²)</th><th>Débit à évacuer version T (m³/h)</th>
+          <th>${gaine ? 'Air chaud gainé (m³/h)' : 'Extraction forcée (m³/h)'}</th>
+          ${gaine ? '<th>Section de gaine mesurée (m²)</th>' : ''}
+          <th>Entrée d'air exigée (m²)</th>
+          ${relevable ? '<th>Débit d\'extracteur relevé (m³/h)</th>' : ''}</tr></thead>
+        <tbody>${lignes}</tbody>
+      </table></div>
+    </div>
+  </div>`;
+}
+
+function renderMachines(a){
+  const box = $('#machineList');
+  if (!S.machines.length){
+    box.innerHTML = `<div class="card"><div class="empty-state"><div class="big">Aucune machine</div>Ajoutez la première machine de la station pour charger ses valeurs constructeur.</div></div>`;
+    return;
+  }
+  const gammes = [];
+  S.machines.forEach(m => { const g = m.gamme || 'Autre'; if (!gammes.includes(g)) gammes.push(g); });
+  box.innerHTML = gammes.map(g => {
+    const liste = S.machines.map((m,i) => ({m,i})).filter(x => (x.m.gamme || 'Autre') === g);
+    return `<div class="group">
+      <div class="ghead"><span class="gn">${liste.length}</span><h3>${esc(g)}</h3><span class="line"></span></div>
+      ${liste.map(({m,i}) => machineCard(m,i,a)).join('')}
+      ${g === GROUPE_COMMUN ? blocCommun(a, liste) : ''}
+    </div>`;
+  }).join('');
+
+  box.querySelectorAll('[data-m]').forEach(el => {
+    const m = S.machines.find(x => x.id === el.dataset.m);
+    if (!m) return;
+    const k = el.dataset.k;
+    if (el.type === 'checkbox') el.onchange = () => { m[k] = el.checked; touch(); };
+    else if (el.tagName === 'BUTTON') el.onclick = () => { m[k] = (m[k] === el.dataset.v) ? '' : el.dataset.v; touch(); };
+    else if (el.tagName === 'SELECT') el.onchange = () => {
+      m[k] = el.value;
+      if (k === 'gamme') m.modele = '';
+      touch();
+    };
+    else {
+      el.oninput = () => {
+        m[k] = el.value; save();
+        const msg = el.parentElement.querySelector('.msg');
+        if (msg && !msg.classList.contains('lock')){ msg.className = 'msg'; msg.textContent = ''; }
+      };
+      el.onchange = () => { m[k] = el.value; touch(); };
+    }
+  });
+
+  box.querySelectorAll('[data-c]').forEach(el => {
+    const k = el.dataset.c;
+    if (el.type === 'checkbox') el.onchange = () => { S[k] = el.checked; touch(); };
+    else if (el.tagName === 'BUTTON') el.onclick = () => { S[k] = (S[k] === el.dataset.v) ? '' : el.dataset.v; touch(); };
+    else if (el.tagName === 'SELECT') el.onchange = () => { S[k] = el.value; touch(); };
+    else { el.oninput = () => { S[k] = el.value; save(); }; el.onchange = () => { S[k] = el.value; touch(); }; }
+  });
+
+  box.querySelectorAll('[data-del]').forEach(b => b.onclick = () => {
+    S.machines = S.machines.filter(x => x.id !== b.dataset.del); touch();
+  });
+}
+
+function scaleHtml(value, max, limit, sev){
+  const pct = value === null ? 0 : Math.max(0, Math.min(100, value / max * 100));
+  const lim = Math.max(0, Math.min(100, limit / max * 100));
+  let ticks = '';
+  for (let i = 1; i < 8; i++) ticks += `<div class="tick${i%2===0?' major':''}" style="left:${i/8*100}%"></div>`;
+  return `<div class="zone" style="left:${lim}%;right:0"></div>${ticks}<div class="fill ${sev}" style="width:${pct}%"></div><div class="limit" style="left:${lim}%"></div>`;
+}
+const sevVit = v => v === null ? 'ok' : (v > V_MAX_GAINE ? 'bad' : (v > V_MAX_GAINE*0.85 ? 'warn' : 'ok'));
+
+/* tableau aéraulique propre à un groupe (compresseurs ou sécheurs) */
+function tableAir(g){
+  const liste = g.liste;
+  const avecExtr = liste.some(m => extracteurRelevable(m));
+  /* groupe sans aucun gainage : seules l'extraction forcée et l'entrée d'air ont un sens */
+  const aucuneGainee = !liste.some(m => gaineDeclaree(m));
+  let sAir = 0, sReq = 0, sExtr = null;
+
+  const lignes = liste.map(m => {
+    const sp = specOf(m.modele);
+    const gainee = gaineDeclaree(m);
+    const sec = num(sectionDe(m));
+    const q = gainee ? (sp.debitGainage || 0) : 0;
+    const v = (gainee && sec && q) ? (q / sec) / 3600 : null;
+    sAir += sp.airFrais || 0;
+    const extr = extracteurRelevable(m) ? totalExtr(m) : null;
+    const req = extracteurRelevable(m) ? debitExtrRequis(m) : null;
+    if (req) sReq += req;
+    if (extr !== null) sExtr = (sExtr || 0) + extr;
+
+    const cellReq = !avecExtr ? '' : `<td class="n">${req ? fmt(req,0) : '<span style="color:var(--ink-3)">—</span>'}</td>`;
+    const cellExtr = !avecExtr ? '' : `<td class="n">${
+      !extracteurRelevable(m) ? '<span style="color:var(--ink-3)">—</span>'
+      : (extr === null ? '<span style="color:var(--warn)">non relevé</span>'
+        : `<span style="color:${req && extr < req ? 'var(--bad)' : 'var(--ok)'};font-weight:600">${fmt(extr,0)}</span>`)
+    }</td>`;
+    const cellsGaine = aucuneGainee ? '' :
+      `<td class="n">${fmt(sp.gaine)}</td>
+       <td class="n" ${(sec !== null && sp.gaine && sec < sp.gaine) ? 'style="color:var(--bad);font-weight:600"' : ''}>${
+         sec !== null ? fmt(sec) : (gainee ? '<span style="color:var(--warn)">non relevée</span>' : '—')}</td>
+       <td class="n" ${v===null?'':`style="color:var(--${sevVit(v)});font-weight:600"`}>${v===null?'—':fmt(v,1)}</td>`;
+
+    return `<tr>
+      <td>${esc(sp.modele)}<br><span style="color:var(--ink-3);font-size:11px">${gainable(m) ? (gainee?'gainée':'non gainée') : 'non gainable'}${isVersionT(m)&&!isSecheur(m)?' · version T':''}</span></td>
+      ${aucuneGainee ? '' : `<td class="n">${gainee ? fmt(q,0) : '—'}</td>`}
+      ${cellReq}${cellExtr}${cellsGaine}
+      <td class="n">${fmt(sp.airFrais)}</td>
+    </tr>`;
+  }).join('');
+
+  const titreReq = aucuneGainee ? 'Débit d\'air extraction forcée' : 'Débit à évacuer version T';
+  const nbCol = 2 + (avecExtr?2:0) + (aucuneGainee?0:4);
+  return `<table class="tbl">
+    <thead><tr><th>Machine</th>
+      ${aucuneGainee ? '' : '<th class="n">Air chaud gainé<span class="u2">m³/h</span></th>'}
+      ${avecExtr?`<th class="n">${titreReq}<span class="u2">m³/h</span></th><th class="n">Extracteurs relevés<span class="u2">m³/h</span></th>`:''}
+      ${aucuneGainee ? '' : '<th class="n">Gaine préconisée<span class="u2">m²</span></th><th class="n">Gaine relevée<span class="u2">m²</span></th><th class="n">Vitesse<span class="u2">m/s</span></th>'}
+      <th class="n">Entrée d'air frais<span class="u2">m²</span></th></tr></thead>
+    <tbody>${lignes || `<tr><td colspan="${nbCol}" style="color:var(--ink-3)">Aucune machine déclarée.</td></tr>`}</tbody>
+    <tfoot><tr><td>Cumul ${esc(g.nom.toLowerCase())}</td>
+      ${aucuneGainee ? '' : `<td class="n">${g.debitGaine?fmt(g.debitGaine,0):'—'}</td>`}
+      ${avecExtr?`<td class="n">${sReq ? fmt(sReq,0) : '—'}</td><td class="n"${
+        (sExtr !== null && sReq && sExtr < sReq) ? ' style="color:var(--bad)"' : (sExtr !== null && sReq ? ' style="color:var(--ok)"' : '')
+      }>${sExtr !== null ? fmt(sExtr,0) : '—'}</td>`:''}
+      ${aucuneGainee ? '' : '<td class="n">—</td><td class="n">—</td><td class="n">—</td>'}
+      <td class="n">${fmt(sAir)}</td></tr></tfoot></table>`;
+}
+
+/* bloc aéraulique d'un groupe : jauge de vitesse, débit gainé, gaine collectrice, tableau */
+function blocAir(g){
+  const { vitesse, collecteur, conduits, debitGaine } = g;
+  const s = sevVit(vitesse);
+  const note = vitesse === null
+    ? (conduits.length
+        ? (collecteur ? 'Renseignez la section de gaine collectrice.' : 'Renseignez la section de gaine mesurée des machines gainées.')
+        : 'Aucune machine de ce groupe n\'est déclarée gainée.')
+    : (s === 'bad' ? `Dépassement de ${fmt(vitesse-V_MAX_GAINE,1)} m/s : augmenter la section ou scinder le gainage.`
+      : s === 'warn' ? 'Marge faible sous la limite de 6 m/s.'
+      : (collecteur ? 'Gaine collectrice, sous la limite de 6 m/s.' : 'Conduit le plus chargé, sous la limite de 6 m/s.'));
+
+  return `<div class="card">
+    <h2>${esc(g.nom)} <span class="hint">${g.liste.length} machine${g.liste.length>1?'s':''} · gainage et vitesses propres au groupe</span></h2>
+    <div class="card-body">
+      <div class="grid g2" style="gap:12px 28px">
+        <div class="gauge" style="margin-bottom:0">
+          <div class="gauge-top">
+            <span class="lbl">Vitesse gainage</span>
+            <span class="val ${vitesse===null?'none':s}">${vitesse===null?'—':fmt(vitesse,1)}</span><span class="unit">m/s</span>
+          </div>
+          <div class="scale">${scaleHtml(vitesse, 8, V_MAX_GAINE, s)}</div>
+          <div class="scale-lbl"><span>0</span><span>2</span><span>4</span><span>6 max</span><span>8</span></div>
+          <div class="msg ${vitesse===null?'':s}" style="margin-top:6px">${note}</div>
+        </div>
+        <div class="grid g2" style="gap:12px 18px">
+          <div class="f"><label><span class="lt">Débit d'air chaud gainé <span class="u">m³/h</span></span></label>
+            <div class="spec"><span>${debitGaine?fmt(debitGaine,0)+' m³/h':'—'}</span><span class="tag">calculé</span></div></div>
+          <div class="f"><label><span class="lt">Section de gaine collectrice <span class="u">m²</span></span></label>
+            <div class="spec"><span>${collecteur && collecteur.section ? fmt(collecteur.section)+' m²' : '—'}</span><span class="tag">saisi</span></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="tblwrap">${tableAir(g)}</div>
+    <div class="card-body" style="padding-top:0"><div class="note">Chaque ligne donne la vitesse dans le conduit propre à la machine. La jauge affiche la vitesse dans la gaine collectrice du groupe. Ni les vitesses ni les sections ne s'additionnent : seuls les débits et les surfaces d'entrée d'air se cumulent.</div></div>
+  </div>`;
+}
+
+function renderAir(a){
+  const { groupes, surfReq, surfMes, surfLibre, coef } = a.air;
+
+  /* --- seule donnée commune aux compresseurs et aux sécheurs : l'entrée d'air frais --- */
+  const s = (surfLibre === null || !surfReq) ? null
+    : (surfLibre < surfReq ? 'bad' : (surfLibre < surfReq*1.1 ? 'warn' : 'ok'));
+  const note = s === null
+    ? (surfReq ? 'Renseignez la surface mesurée et le coefficient de grille, onglet Station.' : 'Déclarez au moins une machine.')
+    : (s === 'bad' ? `Déficit de ${fmt(surfReq-surfLibre)} m² libres.` : `Exigé : ${fmt(surfReq)} m² libres.`);
+
+  $('#airCommun').innerHTML = `
+    <div class="grid g2" style="gap:12px 28px">
+      <div class="gauge" style="margin-bottom:0">
+        <div class="gauge-top">
+          <span class="lbl">Entrée d'air frais</span>
+          <span class="val ${s||'none'}">${surfLibre===null?'—':fmt(surfLibre)}</span><span class="unit">m² libres</span>
+        </div>
+        <div class="scale">${scaleHtml(surfLibre, Math.max(surfReq*1.5, 0.1), surfReq||0.001, surfLibre===null?'ok':(surfLibre<surfReq?'bad':'ok'))}</div>
+        <div class="scale-lbl"><span>0</span><span>${surfReq ? fmt(surfReq)+' m² requis' : 'requis'}</span><span>+50 %</span></div>
+        <div class="msg ${s||''}" style="margin-top:6px">${note}</div>
+      </div>
+      <div class="grid g2" style="gap:12px 18px">
+        <div class="f"><label><span class="lt">Surface d'entrée d'air mesurée <span class="u">m²</span></span></label>
+          <div class="spec"><span>${surfMes===null?'—':fmt(surfMes)+' m²'}</span><span class="tag">station</span></div></div>
+        <div class="f"><label><span class="lt">Coefficient de passage libre</span></label>
+          <div class="spec"><span>${coef===null?'—':fmt(coef,2)}</span><span class="tag">grille</span></div></div>
+      </div>
+    </div>
+    <div class="note">Seule l'entrée d'air frais est commune à la station : la surface libre du local doit couvrir le cumul exigé par toutes les machines, compresseurs et sécheurs confondus. Le gainage, lui, est bilanté séparément pour chaque famille.</div>`;
+
+  const blocs = groupes.filter(g => g.liste.length).map(blocAir).join('');
+  $('#airGroupes').innerHTML = blocs ||
+    `<div class="card"><div class="empty-state"><div class="big">Aucune machine</div>Déclarez les machines de la station pour obtenir les bilans de gainage.</div></div>`;
+}
+
+function renderFindings(a){
+  const box = $('#findings');
+  if (!a.F.length){
+    box.innerHTML = `<div class="empty-state"><div class="big">Aucun point à lever</div>Tous les contrôles renseignés sont conformes.</div>`;
+    return;
+  }
+  const order = {bad:0, warn:1};
+  const sorted = a.F.slice().sort((x,y) => order[x.sev]-order[y.sev]);
+  box.innerHTML = sorted.map(f => `<div class="finding ${f.sev}">
+      <span class="sev">${f.sev==='bad'?'Bloquant':'Réserve'}</span>
+      <span class="txt">${f.txt}${f.where?`<span class="where">${esc(f.where)}</span>`:''}</span>
+      <button class="goto no-print" data-goto="${f.tab}">Ouvrir</button>
+    </div>`).join('');
+  box.querySelectorAll('[data-goto]').forEach(b => b.onclick = () => go(b.dataset.goto));
+}
+
+/* le rapport imprimé reprend les sections 01 à 10 telles quelles :
+   aucun bloc de synthèse supplémentaire n'est ajouté, pour ne pas doubler les pages */
+function renderPrint(){
+  $('#printBlock').innerHTML = '';
+}
+
+/* impression : le panneau Machines n'est rendu que lorsqu'il est affiché,
+   on le régénère avant d'ouvrir la boîte d'impression */
+function imprimer(){
+  renderMachines(analyse());
+  marqueVides();
+  window.print();
+}
+
+/* ===================== champs non renseignés ===================== */
+/* ids à ne jamais signaler en rouge (ex. zones de commentaire libres) :
+   ajoutez-y 's_remarques' et 's_observations' pour les exclure du repérage */
+const NON_REQUIS = new Set([]);
+function champVide(el){
+  if (el.disabled || NON_REQUIS.has(el.id)) return false;
+  if (['checkbox','file','search','hidden','button','submit'].includes(el.type)) return false;
+  return String(el.value ?? '').trim() === '';
+}
+function marqueVides(){
+  const zone = $('main');
+  if (!zone) return;
+  zone.querySelectorAll('input,select,textarea').forEach(el => el.classList.toggle('miss', champVide(el)));
+  /* contrôles avant mise sous tension non validés */
+  zone.querySelectorAll('.chk').forEach(l => {
+    const c = l.querySelector('input[type=checkbox]');
+    l.classList.toggle('miss', !!c && !c.checked);
+  });
+  /* le libellé passe au rouge dès qu'un champ de la case est vide */
+  zone.querySelectorAll('.f').forEach(f => f.classList.toggle('miss', !!f.querySelector('.miss')));
+}
+document.addEventListener('input', marqueVides);
+document.addEventListener('change', marqueVides);
+
+function render(){
+  verrous();
+  const a = analyse();
+  renderTabs(a); renderVerdict(a); renderStation();
+  if (TAB === 'machines') renderMachines(a);
+  renderAir(a); renderFindings(a); renderPrint();
+  marqueVides();
+}
+function refreshLight(){ verrous(); const a = analyse(); renderTabs(a); renderVerdict(a); renderAir(a); renderFindings(a); marqueVides(); }
+function touch(){ save(); render(); }
+
+/* ===================== liaison des champs ===================== */
+function fill(sel, list, val, ph){
+  const el = $(sel);
+  el.innerHTML = `<option value="">${ph||'— choisir —'}</option>` + list.map(o => {
+    const v = Array.isArray(o) ? o[0] : o;
+    return `<option value="${esc(v)}"${v===val?' selected':''}>${esc(v)}</option>`;
+  }).join('');
+}
+
+function syncRacc(){
+  const f = $('#f_compensateur');
+  if (!f) return;
+  const cache = S.r_liaison === 'Présence flexible de liaison';
+  f.classList.toggle('hidden', cache);
+  if (cache && S.r_compensateur){ S.r_compensateur = ''; }
+}
+
+function segments(){
+  $$('select[data-seg]').forEach(sel => {
+    const key = sel.dataset.seg;
+    const opts = sel.dataset.na ? ['Oui','Non','NA'] : ['Oui','Non'];
+    sel.innerHTML = `<option value="">— choisir —</option>` +
+      opts.map(o => `<option value="${o}"${S[key]===o?' selected':''}>${o}</option>`).join('');
+    sel.onchange = () => { S[key] = sel.value; touch(); };
+  });
+}
+
+const ALIAS = { s_tech2:'s_tech', s_date2:'s_date' };
+function bind(){
+  $$('input[id^="s_"],input[id^="r_"],select[id^="s_"],select[id^="r_"],textarea[id^="s_"]').forEach(el => {
+    const key = ALIAS[el.id] || el.id;
+    el.value = S[key] ?? '';
+    const h = () => {
+      S[key] = el.value;
+      if (el.id === 's_grille'){
+        const g = GRILLES.find(x => x[0] === el.value);
+        if (g && g[1] !== null) S.s_coef = String(g[1]);
+        else if (g) S.s_coef = '';
+        $('#s_coef').value = S.s_coef;
+      }
+      Object.entries(ALIAS).forEach(([alias, k]) => { if (k === key && alias !== el.id) $('#'+alias).value = S[key]; });
+      if (key === 's_tech' || key === 's_date') { $('#'+ (el.id.endsWith('2') ? key : key+'2')).value = S[key]; }
+      if (key === 'r_liaison') { syncRacc(); segments(); }
+      save(); refreshLight(); renderStation();
+    };
+    el.oninput = h; el.onchange = h;
+  });
+}
+
+function paint(){
+  fill('#s_neutre', NEUTRE, S.s_neutre, '— non identifié —');
+  fill('#s_grille', GRILLES, S.s_grille);
+  fill('#r_liaison', LIAISONS, S.r_liaison);
+  syncRacc();
+  $('#dl_tech').innerHTML = CAT.t.map(t => `<option value="${esc(t)}">`).join('');
+  bind(); segments();
+}
+
+/* ===================== navigation ===================== */
+function go(tab){
+  TAB = tab;
+  render();
+  window.scrollTo({top:0, behavior:'smooth'});
+  const i = TABS.findIndex(t => t[0] === TAB);
+  $('#btnPrev').disabled = i === 0;
+  /* sur la dernière étape, le bouton de navigation disparaît : l'impression se lance
+     depuis le bouton « Imprimer / PDF » de la section 11 */
+  $('#btnNext').classList.toggle('hidden', i === TABS.length-1);
+}
+
+/* ===================== persistance ===================== */
+let saveTimer = null;
+function save(){
+  clearTimeout(saveTimer);
+  $('#saveState').textContent = 'Enregistrement…';
+  saveTimer = setTimeout(async () => {
+    await Store.set('mer:dossier', JSON.stringify(S));
+    const h = new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+    $('#saveState').textContent = 'Enregistré localement à ' + h;
+  }, 500);
+}
+function download(name, text, type){
+  const b = new Blob([text], {type});
+  const u = URL.createObjectURL(b);
+  const a = document.createElement('a');
+  a.href = u; a.download = name; a.click();
+  setTimeout(() => URL.revokeObjectURL(u), 2000);
+}
+function slug(){ return (S.s_client || 'station').replace(/[^\w\- ]+/g,'').trim().replace(/\s+/g,'_').slice(0,40) || 'station'; }
+
+/* ===================== actions ===================== */
+function wire(){
+  $('#addMachine').onclick = () => { S.machines.push(newMachine()); TAB='machines'; touch(); };
+  $('#btnPrint').onclick = imprimer;
+  $('#btnNew').onclick = () => { if (confirm('Fermer ce dossier et repartir d\'une fiche vierge ?')) { S = blank(); seq = 1; paint(); go('station'); save(); } };
+  $('#btnPrev').onclick = () => { const i = TABS.findIndex(t=>t[0]===TAB); if (i>0) go(TABS[i-1][0]); };
+  $('#btnNext').onclick = () => { const i = TABS.findIndex(t=>t[0]===TAB); if (i<TABS.length-1) go(TABS[i+1][0]); };
+  $('#btnJson').onclick = () => download(`checklist_${slug()}.json`, JSON.stringify(S,null,2), 'application/json');
+  $('#btnCsv').onclick = () => {
+    const a = analyse();
+    const q = v => '"' + String(v ?? '').replace(/"/g,'""') + '"';
+    const L = [['Champ','Valeur']];
+    Object.entries(S).forEach(([k,v]) => { if (k !== 'machines') L.push([k, v]); });
+    L.push([]); L.push(['#','Modèle','Famille','Série','EMR','Protection — type','Protection — marque','Protection — taille (A)','Protection — classe/courbe','DDR — sensibilité (mA)','DDR — type','Câble — matière','Câble posé','T11 (V)','Contrôles validés']);
+    S.machines.forEach((m,i) => { const sp = specOf(m.modele)||{};
+      L.push([i+1, m.modele, sp.famille||'', m.serie, m.emr, m.protType, m.protMarque, m.protTaille, m.protType==='Fusible'?m.protClasse:m.protCourbe, m.protDdrSens, m.protDdrType, m.cableMat, m.cableUtil, m.tensT11, controlesDe(m).filter(c=>controleDe(m,c[0])).length + '/' + controlesDe(m).length]); });
+    L.push([]); L.push(['Niveau','Objet','Constat']);
+    a.F.forEach(f => L.push([f.sev==='bad'?'Bloquant':'Réserve', f.where||'Station', f.txt.replace(/<[^>]+>/g,'')]));
+    download(`releve_${slug()}.csv`, '\uFEFF' + L.map(r => r.map(q).join(';')).join('\n'), 'text/csv');
+  };
+  $('#btnImport').onclick = () => $('#fileImport').click();
+  $('#fileImport').onchange = e => {
+    const f = e.target.files[0]; if (!f) return;
+    const r = new FileReader();
+    r.onload = () => {
+      try {
+        const d = JSON.parse(r.result);
+        S = Object.assign(blank(), d);
+        S.machines = (d.machines || []).map(m => Object.assign(newMachine(), m));
+        paint(); go('station'); save();
+      } catch(err){ alert('Fichier illisible : ce n\'est pas un dossier exporté par l\'application.'); }
+    };
+    r.readAsText(f);
+    e.target.value = '';
+  };
+}
+
+/* ===================== administration du catalogue ===================== */
+const ADM = { filtre:'', gamme:'', code:'1234' };
+
+const rowKey = r => String(r[0]).trim().toLowerCase();
+function baseRow(nom){ return BASE.m.find(r => rowKey(r) === String(nom).trim().toLowerCase()); }
+function etatRow(r){
+  const b = baseRow(r[0]);
+  if (!b) return 'added';
+  for (let i = 1; i <= 7; i++) if ((r[i] ?? '') !== (b[i] ?? '')) return 'edited';
+  if (BASE.g[b[8]] !== CAT.g[r[8]] || (BASE.f[b[9]] ?? '') !== (CAT.f[r[9]] ?? '')) return 'edited';
+  if ((r[10] ?? '') !== (b[10] ?? '')) return 'edited';
+  return '';
+}
+function catStatus(msg){
+  const n = CAT.m.filter(r => etatRow(r)).length;
+  $('#admMsg').textContent = (msg ? msg + ' — ' : '') +
+    (n ? `${n} modèle${n>1?'s':''} personnalisé${n>1?'s':''}` : 'catalogue d\'origine, aucune modification');
+}
+async function catSave(msg){
+  await Store.set('mer:catalogue', JSON.stringify(CAT));
+  catStatus(msg || 'Enregistré');
+}
+function catRefresh(){ admRender(); render(); }
+
+function admRender(){
+  const f = ADM.filtre.trim().toLowerCase();
+  const rows = CAT.m.map((r,i) => ({r,i}))
+    .filter(({r}) => (!ADM.gamme || CAT.g[r[8]] === ADM.gamme))
+    .filter(({r}) => !f || rowKey(r).includes(f) || String(CAT.f[r[9]] ?? '').toLowerCase().includes(f));
+  const CAP = 500;
+  const shown = rows.slice(0, CAP);
+  $('#admCount').textContent = `${rows.length} modèle${rows.length>1?'s':''} sur ${CAT.m.length}` + (rows.length > CAP ? ` — ${CAP} affichés, affinez la recherche` : '');
+
+  const head = '<thead><tr>' + COLS.map(c => `<th>${c[1]}</th>`).join('') + '<th></th><th></th></tr></thead>';
+  const body = shown.map(({r,i}) => {
+    const et = etatRow(r);
+    const cells = COLS.map(c => {
+      const k = c[3];
+      if (c[2] === 'gam')
+        return `<td><select data-r="${i}" data-c="8">${CAT.g.map((g,gi)=>`<option value="${gi}"${gi===r[8]?' selected':''}>${esc(g)}</option>`).join('')}</select></td>`;
+      if (c[2] === 'fam')
+        return `<td><input list="dl_fam" data-r="${i}" data-c="9" value="${esc(CAT.f[r[9]] ?? '')}"></td>`;
+      if (c[2] === 'num')
+        return `<td><input class="n" type="number" step="any" data-r="${i}" data-c="${k}" value="${r[k] ?? ''}"></td>`;
+      return `<td class="${k===0?'mdl':''}"><input data-r="${i}" data-c="${k}" value="${esc(r[k] ?? '')}"></td>`;
+    }).join('');
+    return `<tr class="${et}">${cells}<td><span class="flag">${et==='added'?'ajouté':(et==='edited'?'modifié':'')}</span></td>
+      <td><button class="del" data-del="${i}">Suppr.</button></td></tr>`;
+  }).join('');
+  $('#admTbl').innerHTML = head + `<tbody>${body || '<tr><td colspan="13" style="padding:22px;color:var(--ink-3)">Aucun modèle ne correspond.</td></tr>'}</tbody>`
+    + `<datalist id="dl_fam">${CAT.f.map(x=>`<option value="${esc(x)}">`).join('')}</datalist>`;
+
+  $('#admTbl').querySelectorAll('[data-r]').forEach(el => {
+    el.onchange = async () => {
+      const r = CAT.m[+el.dataset.r], c = +el.dataset.c;
+      if (c === 8) r[8] = +el.value;
+      else if (c === 9){
+        const nom = el.value.trim();
+        if (!nom) r[9] = null;
+        else {
+          let idx = CAT.f.findIndex(x => x.toLowerCase() === nom.toLowerCase());
+          if (idx < 0){ CAT.f.push(nom); idx = CAT.f.length - 1; }
+          r[9] = idx;
+        }
+      }
+      else if (c === 0){
+        const avant = r[0], apres = el.value.trim();
+        if (!apres){ el.value = avant; return; }
+        if (CAT.m.some((x,j) => j !== +el.dataset.r && rowKey(x) === apres.toLowerCase())){
+          alert('Ce modèle existe déjà dans le catalogue.'); el.value = avant; return;
+        }
+        r[0] = apres;
+        S.machines.forEach(m => { if (m.modele === avant) m.modele = apres; });
+      }
+      else if (COLS.find(x => x[3] === c)[2] === 'num') r[c] = el.value === '' ? null : parseFloat(el.value);
+      else r[c] = el.value.trim() || null;
+      await catSave('Modification enregistrée');
+      catRefresh();
+    };
+  });
+  $('#admTbl').querySelectorAll('[data-del]').forEach(b => b.onclick = async () => {
+    const r = CAT.m[+b.dataset.del];
+    const used = S.machines.filter(m => m.modele === r[0]).length;
+    if (!confirm(`Supprimer « ${r[0]} » du catalogue ?` + (used ? `\n\n${used} machine(s) du chantier en cours l'utilisent et perdront leurs valeurs constructeur.` : ''))) return;
+    CAT.m.splice(+b.dataset.del, 1);
+    await catSave('Modèle supprimé');
+    catRefresh();
+  });
+}
+
+function admOpen(){
+  fill('#admGamme', CAT.g, ADM.gamme, 'Toutes gammes');
+  $('#admOvl').hidden = false;
+  admRender(); catStatus('');
+}
+
+function admWire(){
+  $('#btnAdmin').onclick = () => { $('#gateOvl').hidden = false; $('#gateCode').value = ''; $('#gateErr').textContent = ''; setTimeout(()=>$('#gateCode').focus(), 60); };
+  $('#gateCancel').onclick = () => { $('#gateOvl').hidden = true; };
+  const tryGate = () => {
+    if ($('#gateCode').value === ADM.code){ $('#gateOvl').hidden = true; admOpen(); }
+    else { $('#gateErr').textContent = 'Code incorrect.'; $('#gateCode').select(); }
+  };
+  $('#gateOk').onclick = tryGate;
+  $('#gateCode').onkeydown = e => { if (e.key === 'Enter') tryGate(); };
+  $('#admClose').onclick = () => { $('#admOvl').hidden = true; render(); };
+  $('#admSearch').oninput = e => { ADM.filtre = e.target.value; admRender(); };
+  $('#admGamme').onchange = e => { ADM.gamme = e.target.value; admRender(); };
+
+  $('#admAdd').onclick = async () => {
+    const g = Math.max(0, CAT.g.indexOf(ADM.gamme));
+    CAT.m.unshift(['Nouveau modèle', null, null, null, null, null, null, null, g, null, null]);
+    ADM.filtre = ''; $('#admSearch').value = '';
+    await catSave('Modèle ajouté'); catRefresh();
+    const first = $('#admTbl').querySelector('td.mdl input');
+    if (first){ first.focus(); first.select(); }
+  };
+  $('#admAddGamme').onclick = async () => {
+    const nom = prompt('Nom de la nouvelle gamme (ex. Surpresseur) :');
+    if (!nom || !nom.trim()) return;
+    if (CAT.g.some(g => g.toLowerCase() === nom.trim().toLowerCase())) return alert('Cette gamme existe déjà.');
+    CAT.g.push(nom.trim());
+    await catSave('Gamme ajoutée');
+    fill('#admGamme', CAT.g, ADM.gamme, 'Toutes gammes');
+    catRefresh();
+  };
+  $('#admCode').onclick = async () => {
+    const a = prompt('Code actuel :'); if (a !== ADM.code) return alert('Code incorrect.');
+    const b = prompt('Nouveau code :'); if (!b || !b.trim()) return;
+    ADM.code = b.trim(); await Store.set('mer:code', ADM.code);
+    alert('Code modifié.');
+  };
+  $('#admExport').onclick = () => download('catalogue_machines.json', JSON.stringify(CAT, null, 2), 'application/json');
+  $('#admImport').onclick = () => $('#admFile').click();
+  $('#admFile').onchange = e => {
+    const f = e.target.files[0]; if (!f) return;
+    const rd = new FileReader();
+    rd.onload = async () => {
+      try {
+        const d = JSON.parse(rd.result);
+        if (!d || !Array.isArray(d.m) || !Array.isArray(d.g) || !Array.isArray(d.f)) throw 0;
+        if (!confirm(`Remplacer le catalogue actuel par ce fichier (${d.m.length} modèles) ?`)) return;
+        CAT = { g:d.g, f:d.f, m:d.m, t:d.t || CAT.t };
+        await catSave('Catalogue importé');
+        fill('#admGamme', CAT.g, '', 'Toutes gammes'); ADM.gamme = '';
+        catRefresh();
+      } catch(err){ alert('Fichier illisible : ce n\'est pas un catalogue exporté par l\'application.'); }
+    };
+    rd.readAsText(f); e.target.value = '';
+  };
+  $('#admReset').onclick = async () => {
+    if (!confirm('Effacer toutes les modifications et revenir au catalogue d\'origine ?')) return;
+    CAT = JSON.parse(JSON.stringify(BASE));
+    await catSave('Catalogue réinitialisé');
+    fill('#admGamme', CAT.g, '', 'Toutes gammes'); ADM.gamme = '';
+    catRefresh();
+  };
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape'){ $('#admOvl').hidden = true; $('#gateOvl').hidden = true; }
+  });
+}
+
+/* ===================== démarrage ===================== */
+(async function init(){
+  const cat = await Store.get('mer:catalogue');
+  if (cat){ try { const d = JSON.parse(cat); if (Array.isArray(d.m) && d.m.length) CAT = { g:d.g, f:d.f, m:d.m, t:d.t || CAT.t }; } catch(e){} }
+  const code = await Store.get('mer:code');
+  if (code) ADM.code = code;
+  const raw = await Store.get('mer:dossier');
+  if (raw){ try { const d = JSON.parse(raw); S = Object.assign(blank(), d); S.machines = (d.machines||[]).map(m => Object.assign(newMachine(), m)); } catch(e){} }
+  if (!S.s_date) S.s_date = new Date().toISOString().slice(0,10);
+  paint(); wire(); admWire(); go('station');
+  $('#saveState').textContent = raw ? 'Dossier restauré' : 'Nouveau dossier';
+})();
+</script>
+</body>
+</html>
