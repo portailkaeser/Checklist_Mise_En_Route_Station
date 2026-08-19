@@ -594,7 +594,6 @@ input:disabled::placeholder{color:var(--ink-3);font-style:italic}
         <button class="btn primary" id="btnPrint">Imprimer / PDF</button>
         <button class="btn" id="btnMail">Envoyer au support technique</button>
         <button class="btn" id="btnJson">Exporter le dossier (.json)</button>
-        <button class="btn" id="btnCsv">Exporter le relevé (.csv)</button>
         <button class="btn" id="btnImport">Rouvrir un dossier</button>
         <input type="file" id="fileImport" accept=".json" class="hidden">
       </div>
@@ -1853,18 +1852,6 @@ function wire(){
   $('#btnPrev').onclick = () => { const i = TABS.findIndex(t=>t[0]===TAB); if (i>0) go(TABS[i-1][0]); };
   $('#btnNext').onclick = () => { const i = TABS.findIndex(t=>t[0]===TAB); if (i<TABS.length-1) go(TABS[i+1][0]); };
   $('#btnJson').onclick = () => download(`checklist_${slug()}.json`, JSON.stringify(S,null,2), 'application/json');
-  $('#btnCsv').onclick = () => {
-    const a = analyse();
-    const q = v => '"' + String(v ?? '').replace(/"/g,'""') + '"';
-    const L = [['Champ','Valeur']];
-    Object.entries(S).forEach(([k,v]) => { if (k !== 'machines') L.push([k, v]); });
-    L.push([]); L.push(['#','Modèle','Famille','Série','EMR','Protection — type','Protection — marque','Protection — taille (A)','Protection — classe/courbe','DDR — sensibilité (mA)','DDR — type','Câble — matière','Câble posé','T11 (V)','Contrôles validés']);
-    S.machines.forEach((m,i) => { const sp = specOf(m.modele)||{};
-      L.push([i+1, m.modele, sp.famille||'', m.serie, m.emr, m.protType, m.protMarque, m.protTaille, m.protType==='Fusible'?m.protClasse:m.protCourbe, m.protDdrSens, m.protDdrType, m.cableMat, m.cableUtil, m.tensT11, controlesDe(m).filter(c=>controleDe(m,c[0])).length + '/' + controlesDe(m).length]); });
-    L.push([]); L.push(['Niveau','Objet','Constat']);
-    a.F.forEach(f => L.push([f.sev==='bad'?'Bloquant':'Réserve', f.where||'Station', f.txt.replace(/<[^>]+>/g,'')]));
-    download(`releve_${slug()}.csv`, '\uFEFF' + L.map(r => r.map(q).join(';')).join('\n'), 'text/csv');
-  };
   $('#btnImport').onclick = () => $('#fileImport').click();
   $('#fileImport').onchange = e => {
     const f = e.target.files[0]; if (!f) return;
