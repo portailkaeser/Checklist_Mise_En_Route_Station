@@ -285,6 +285,14 @@ input.miss::placeholder,textarea.miss::placeholder{color:var(--ink-3);opacity:1}
 }
 .footbar-in{max-width:1180px;margin:0 auto;padding:9px 18px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 .footbar .save{font-family:var(--mono);font-size:11px;color:var(--ink-3);flex:1;min-width:120px}
+/* écrans étroits : l'indicateur de sauvegarde passe sur sa propre ligne pour
+   que Catalogue s'aligne avec Nouveau chantier, Précédent et Suivant au lieu
+   d'être repoussé seul à droite */
+@media (max-width:700px){
+  .footbar-in{gap:8px}
+  .footbar .save{flex:0 0 100%;min-width:0;order:-1;margin-bottom:2px}
+  .footbar .btn{flex:1 1 auto;justify-content:center}
+}
 
 .tbl{width:100%;border-collapse:collapse;font-size:13px}
 .tbl th{
@@ -573,7 +581,8 @@ html.pdf-print, .pdf-print body{margin:0;padding:0;height:auto}
     <div class="card">
       <h2><span class="idx">01</span> Chantier</h2>
       <div class="card-body grid g3">
-        <div class="f"><label><span class="lt">Nom client + compte SAP</span></label><input id="s_client" placeholder="Nom du client + compte SAP"></div>
+        <div class="f"><label><span class="lt">Nom client</span></label><input id="s_client" placeholder="Nom du client"></div>
+        <div class="f"><label><span class="lt">Compte SAP</span></label><input id="s_sap" class="num" placeholder="N° de compte SAP"></div>
         <div class="f"><label><span class="lt">CS n°</span></label><input id="s_cs" class="num" placeholder="N° CS"></div>
         <div class="f"><label><span class="lt">Date d'intervention</span></label><input id="s_date" type="date"></div>
         <div class="f"><label><span class="lt">Technicien</span></label><input id="s_tech" list="dl_tech" placeholder="Nom du technicien"><datalist id="dl_tech"></datalist></div>
@@ -868,6 +877,45 @@ function activerFiltreStyles(){
 /* échelle : 2 suffit largement pour un A4 lisible. À 3, le canevas d'un
    dossier long dépasse la mémoire disponible sur beaucoup de téléphones et
    la capture revient vide ou échoue. */
+/* ---------- suppression des pages blanches ----------
+   html2pdf découpe un canevas unique en feuilles A4 : nPages = hauteur du
+   canevas / hauteur d'une page. Le conteneur qu'il fabrique est plus haut que
+   le contenu réel, ce qui produit une à deux feuilles entièrement blanches en
+   fin de document. On mesure donc la dernière ligne non blanche du canevas et
+   on le recadre avant le découpage. */
+function hauteurUtile(canvas){
+  const l = canvas.width, h = canvas.height, pas = 40;
+  const ctx = canvas.getContext('2d', { willReadFrequently:true });
+  for (let bas = h; bas > 0; bas -= pas){
+    const haut = Math.max(0, bas - pas);
+    const d = ctx.getImageData(0, haut, l, bas - haut).data;
+    for (let i = d.length - 4; i >= 0; i -= 4){
+      if (d[i] < 246 || d[i+1] < 246 || d[i+2] < 246){
+        return Math.min(h, haut + Math.floor((i / 4) / l) + 1);
+      }
+    }
+  }
+  return h;
+}
+
+function rognerCanvas(canvas, echelle){
+  try{
+    const utile = hauteurUtile(canvas);
+    const marge = Math.round(10 * (echelle || 2));            // respiration en bas de page
+    const cible = Math.min(canvas.height, utile + marge);
+    if (cible >= canvas.height - 4) return canvas;            // rien à gagner
+    const c = document.createElement('canvas');
+    c.width = canvas.width; c.height = cible;
+    const ctx = c.getContext('2d');
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, c.width, c.height);
+    ctx.drawImage(canvas, 0, 0, canvas.width, cible, 0, 0, canvas.width, cible);
+    return c;
+  } catch(e){
+    return canvas;                                            // canevas illisible : on garde tel quel
+  }
+}
+
 async function genererPdfBlob(echelle){
   if (typeof html2pdf === 'undefined'){
     throw new Error("bibliothèque PDF non chargée (le fichier doit être ouvert une première fois avec une connexion internet).");
@@ -885,7 +933,7 @@ async function genererPdfBlob(echelle){
   try {
     const opt = {
       margin: 8,
-      filename: `checklist_${slug()}.pdf`,
+      filename: nomFichier('pdf'),
       image: { type:'jpeg', quality:0.92 },
       html2canvas: { scale: echelle || 2, useCORS:true, backgroundColor:'#ffffff', logging:false, scrollX:0, scrollY:0 },
       jsPDF: { unit:'mm', format:'a4', orientation:'portrait', compress:true },
@@ -894,7 +942,16 @@ async function genererPdfBlob(echelle){
          laissait la moitié de chaque feuille vide. */
       pagebreak: { mode:['css','legacy'], avoid:['.chk','.finding','.f','.gauge','.mhead','.ghead'] }
     };
-    return await html2pdf().set(opt).from($('main')).outputPdf('blob');
+    const travail = html2pdf().set(opt).from($('main'));
+    try {
+      await travail.toCanvas();
+      travail.prop.canvas = rognerCanvas(travail.prop.canvas, opt.html2canvas.scale);
+      return await travail.toPdf().outputPdf('blob');
+    } catch(e){
+      /* si la version de html2pdf n'expose pas les étapes intermédiaires,
+         on retombe sur la génération standard (avec ses pages blanches) */
+      return await html2pdf().set(opt).from($('main')).outputPdf('blob');
+    }
   } finally {
     restaurerStyles();
     document.documentElement.classList.remove('pdf-print');
@@ -934,12 +991,13 @@ async function envoyerSupport(){
     const b64 = await blobToBase64(blob);
 
     msg.textContent = 'Envoi en cours…';
-    const client = S.s_client || 'Station';
+    const client = [S.s_client, S.s_sap].filter(Boolean).join(' ') || 'Station';
     const sujet = `Mise en route station — ${client}${S.s_date ? ' — ' + S.s_date : ''}`;
     const corps = [
       'Fiche de mise en route transmise automatiquement depuis le check-list de mise en service.',
       '',
       `Client : ${client}`,
+      `CS n° : ${S.s_cs || '—'}`,
       `Date d'intervention : ${S.s_date || '—'}`,
       `Technicien : ${S.s_tech || '—'}`
     ].join('\n');
@@ -949,7 +1007,7 @@ async function envoyerSupport(){
       to: MAIL_CONFIG.destinataire,
       sujet, corps,
       pdf: b64,
-      fichier: `checklist_${slug()}.pdf`,
+      fichier: nomFichier('pdf'),
       expediteur: 'KAESER — Mise en route station'
     };
     if (MAIL_CONFIG.cc) payload.cc = MAIL_CONFIG.cc;
@@ -1026,7 +1084,7 @@ const TABS = [
 
 /* ===================== état ===================== */
 const blank = () => ({
-  s_client:'', s_cs:'', s_date:new Date().toISOString().slice(0,10), s_tech:'',
+  s_client:'', s_sap:'', s_cs:'', s_date:new Date().toISOString().slice(0,10), s_tech:'',
   s_tamb:'', s_horsgel:'', s_utri:'', s_umono:'', s_neutre:'',
   c_gainee:'', c_gaineMes:'', c_collectrice:'', c_clapet:'', c_vitmoteur:'', c_recyclage:'', c_recyclagedest:'',
   c_ckBornes:false, c_ckPhases:false, c_ckVent:false, c_ckT11:false,
@@ -1218,6 +1276,7 @@ function analyse(){
 
   /* --- chantier --- */
   if (!S.s_client) add('warn','station','Nom du client non renseigné.');
+  if (!S.s_sap) add('warn','station','Compte SAP non renseigné.');
   if (!S.s_tech) add('warn','rapport','Technicien non renseigné.');
   if (S.s_horsgel === 'Non') add('bad','station','Local non hors gel : risque de gel des condensats et du réseau.');
   const utri = num(S.s_utri);
@@ -1343,12 +1402,12 @@ function renderTabs(a){
 function renderVerdict(a){
   const v = $('#verdict'), t = $('#verdictTxt');
   let cls = 'ok', txt = 'Conforme';
-  if (!S.machines.length && !S.s_client) { cls='ok'; txt='À compléter'; }
+  if (!S.machines.length && !S.s_client && !S.s_sap) { cls='ok'; txt='À compléter'; }
   else if (a.counts.bad) { cls='bad'; txt = a.counts.bad + ' point' + (a.counts.bad>1?'s':'') + ' bloquant' + (a.counts.bad>1?'s':''); }
   else if (a.counts.warn) { cls='warn'; txt = a.counts.warn + ' réserve' + (a.counts.warn>1?'s':''); }
   v.className = 'verdict ' + cls;
   t.textContent = txt;
-  const c = [S.s_client, S.s_cs ? 'CS ' + S.s_cs : ''].filter(Boolean).join(' — ');
+  const c = [[S.s_client, S.s_sap].filter(Boolean).join(' '), S.s_cs ? 'CS ' + S.s_cs : ''].filter(Boolean).join(' — ');
   $('#chipClient').textContent = c || 'Aucun chantier ouvert';
 }
 
@@ -1888,6 +1947,14 @@ function renderPrint(){
 function imprimer(){
   renderMachines(analyse());
   marqueVides();
+  /* sur Android comme sur ordinateur, la boîte d'impression propose le titre
+     du document comme nom de fichier : on lui donne le même que la pièce
+     jointe, puis on remet le titre d'origine. */
+  const titre = document.title;
+  document.title = nomFichier('pdf').replace(/\.pdf$/, '');
+  const remise = () => { document.title = titre; window.removeEventListener('afterprint', remise); };
+  window.addEventListener('afterprint', remise);
+  setTimeout(remise, 60000);
   window.print();
 }
 
@@ -2014,7 +2081,37 @@ function download(name, text, type){
   a.href = u; a.download = name; a.click();
   setTimeout(() => URL.revokeObjectURL(u), 2000);
 }
-function slug(){ return (S.s_client || 'station').replace(/[^\w\- ]+/g,'').trim().replace(/\s+/g,'_').slice(0,40) || 'station'; }
+/* nom des fichiers produits : « CLIENT-COMPTESAP-CS_NUMÉRO », par exemple
+   OXXO-7765378-CS_34568998. Le nom du client est mis en capitales et ses
+   espaces internes remplacés par un souligné, pour que le tiret reste le seul
+   séparateur de champs. Un champ vide est simplement omis. Les caractères
+   interdits dans un nom de fichier (Windows, Android, Drive) sont retirés. */
+function nomFichier(ext){
+  const propre = v => String(v ?? '')
+    .replace(/[\\/:*?"<>|]+/g, ' ')
+    /* eslint-disable-next-line no-control-regex */
+    .replace(/[\u0000-\u001f]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .replace(/\s/g, '_');
+  const client = propre(S.s_client).toUpperCase();
+  const sap = propre(S.s_sap);
+  const cs = propre(S.s_cs);
+  let n = [client, sap, cs ? 'CS_' + cs : ''].filter(Boolean).join('-').slice(0, 90)
+    .replace(/[-_]+$/, '');
+  if (!n) n = 'MISE_EN_ROUTE_STATION';
+  return n + '.' + ext;
+}
+
+/* dossiers créés avant la séparation du champ : « Oxxo 7765378 » tenait dans
+   le seul champ client. On reporte le nombre final dans le compte SAP. */
+function migrer(d){
+  if (d && !d.s_sap && typeof d.s_client === 'string'){
+    const m = d.s_client.trim().match(/^(.*[^\s\d])\s+(\d{4,})$/);
+    if (m){ d.s_client = m[1].trim(); d.s_sap = m[2]; }
+  }
+  return d;
+}
 
 /* ===================== actions ===================== */
 function wire(){
@@ -2024,14 +2121,14 @@ function wire(){
   $('#btnNew').onclick = () => { if (confirm('Fermer ce dossier et repartir d\'une fiche vierge ?')) { S = blank(); seq = 1; paint(); go('station'); save(); } };
   $('#btnPrev').onclick = () => { const i = TABS.findIndex(t=>t[0]===TAB); if (i>0) go(TABS[i-1][0]); };
   $('#btnNext').onclick = () => { const i = TABS.findIndex(t=>t[0]===TAB); if (i<TABS.length-1) go(TABS[i+1][0]); };
-  $('#btnJson').onclick = () => download(`checklist_${slug()}.json`, JSON.stringify(S,null,2), 'application/json');
+  $('#btnJson').onclick = () => download(nomFichier('json'), JSON.stringify(S,null,2), 'application/json');
   $('#btnImport').onclick = () => $('#fileImport').click();
   $('#fileImport').onchange = e => {
     const f = e.target.files[0]; if (!f) return;
     const r = new FileReader();
     r.onload = () => {
       try {
-        const d = JSON.parse(r.result);
+        const d = migrer(JSON.parse(r.result));
         S = Object.assign(blank(), d);
         S.machines = (d.machines || []).map(m => Object.assign(newMachine(), m));
         paint(); go('station'); save();
@@ -2211,7 +2308,7 @@ function admWire(){
   const code = await Store.get('mer:code');
   if (code) ADM.code = code;
   const raw = await Store.get('mer:dossier');
-  if (raw){ try { const d = JSON.parse(raw); S = Object.assign(blank(), d); S.machines = (d.machines||[]).map(m => Object.assign(newMachine(), m)); } catch(e){} }
+  if (raw){ try { const d = migrer(JSON.parse(raw)); S = Object.assign(blank(), d); S.machines = (d.machines||[]).map(m => Object.assign(newMachine(), m)); } catch(e){} }
   if (!S.s_date) S.s_date = new Date().toISOString().slice(0,10);
   paint(); wire(); admWire(); go('station');
   $('#saveState').textContent = raw ? 'Dossier restauré' : 'Nouveau dossier';
