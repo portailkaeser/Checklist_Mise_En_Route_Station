@@ -337,7 +337,11 @@ input:disabled::placeholder{color:var(--ink-3);font-style:italic}
   section[role="tabpanel"].hidden{display:block !important}
   .print-only{display:block !important}
 
-  .card{break-inside:avoid;border-color:#9AA2AA;margin-bottom:4px}
+  /* seules les petites unités sont protégées : interdire la coupure des
+     cartes entières multipliait les pages à moitié vides */
+  .card{break-inside:auto;border-color:#9AA2AA;margin-bottom:4px}
+  .card > h2{break-after:avoid}
+  .f,.finding,.gauge,.ghead,.mhead,.tbl tr{break-inside:avoid}
   .card > h2{padding:3px 7px;font-size:10px;letter-spacing:.08em}
   .card > h2 .hint{font-size:8px}
   .card-body{padding:4px 7px}
@@ -353,7 +357,7 @@ input:disabled::placeholder{color:var(--ink-3);font-style:italic}
   .spec{padding:0 5px;font-size:9px}
   .spec .tag{font-size:7.5px}
 
-  .checks{break-inside:avoid}
+  .checks{break-inside:auto}
   .chk{padding:1px 6px;gap:6px}
   .chk input{width:11px;height:11px}
   .chk input:checked::after{left:3px;top:1px;width:3px;height:5px;border-width:1.5px}
@@ -363,13 +367,13 @@ input:disabled::placeholder{color:var(--ink-3);font-style:italic}
   .group{margin-bottom:6px}
   .ghead{margin-bottom:4px}
   .ghead h3{font-size:11px}
-  .mrow{margin-bottom:4px;break-inside:avoid}
+  .mrow{margin-bottom:4px;break-inside:auto}
   .mhead{padding:2px 6px;gap:8px}
   .mhead .t{font-size:11px}
   .mhead .cool,.mhead .st{font-size:8px;padding:1px 5px}
   .mhead button.x{display:none}
   .mbody{padding:4px}
-  .common{margin-bottom:4px;break-inside:avoid}
+  .common{margin-bottom:4px;break-inside:auto}
   .common > h4{padding:3px 7px;font-size:9px}
   .common-body{padding:4px}
   .common-body .tbl{margin-top:4px}
@@ -397,6 +401,10 @@ input:disabled::placeholder{color:var(--ink-3);font-style:italic}
   /* aides de saisie, sans objet sur le rapport */
   .note{display:none}
   #addMachine{display:none !important}
+  /* blocs vides : sources de pages blanches en fin de rapport */
+  #printBlock:empty,.card-body:empty,.f .msg:empty,section[role="tabpanel"]:empty,#machineList:empty{display:none !important}
+  main{padding:0;margin:0}
+  body{margin:0}
 
   /* aplats conservés à l'impression (jauges, valeurs catalogue, en-têtes) */
   .scale,.scale .fill,.scale .zone,.scale .limit,.spec,.card > h2,.mhead,
@@ -422,7 +430,7 @@ input:disabled::placeholder{color:var(--ink-3);font-style:italic}
 .pdf-print main{padding:0;max-width:none}
 .pdf-print section[role="tabpanel"].hidden{display:block !important}
 .pdf-print .print-only{display:block !important}
-.pdf-print .card{break-inside:avoid;border-color:#9AA2AA;margin-bottom:4px}
+.pdf-print .card{break-inside:auto;border-color:#9AA2AA;margin-bottom:4px}
 .pdf-print .card > h2{padding:3px 7px;font-size:10px;letter-spacing:.08em}
 .pdf-print .card > h2 .hint{font-size:8px}
 .pdf-print .card-body{padding:4px 7px}
@@ -436,7 +444,7 @@ input:disabled::placeholder{color:var(--ink-3);font-style:italic}
 .pdf-print .f .msg{font-size:7.5px;line-height:1.15;min-height:0}
 .pdf-print .spec{padding:0 5px;font-size:9px}
 .pdf-print .spec .tag{font-size:7.5px}
-.pdf-print .checks{break-inside:avoid}
+.pdf-print .checks{break-inside:auto}
 .pdf-print .chk{padding:1px 6px;gap:6px}
 .pdf-print .chk input{width:11px;height:11px}
 .pdf-print .chk input:checked::after{left:3px;top:1px;width:3px;height:5px;border-width:1.5px}
@@ -445,13 +453,13 @@ input:disabled::placeholder{color:var(--ink-3);font-style:italic}
 .pdf-print .group{margin-bottom:6px}
 .pdf-print .ghead{margin-bottom:4px}
 .pdf-print .ghead h3{font-size:11px}
-.pdf-print .mrow{margin-bottom:4px;break-inside:avoid}
+.pdf-print .mrow{margin-bottom:4px;break-inside:auto}
 .pdf-print .mhead{padding:2px 6px;gap:8px}
 .pdf-print .mhead .t{font-size:11px}
 .pdf-print .mhead .cool, .pdf-print .mhead .st{font-size:8px;padding:1px 5px}
 .pdf-print .mhead button.x{display:none}
 .pdf-print .mbody{padding:4px}
-.pdf-print .common{margin-bottom:4px;break-inside:avoid}
+.pdf-print .common{margin-bottom:4px;break-inside:auto}
 .pdf-print .common > h4{padding:3px 7px;font-size:9px}
 .pdf-print .common-body{padding:4px}
 .pdf-print .common-body .tbl{margin-top:4px}
@@ -476,6 +484,14 @@ input:disabled::placeholder{color:var(--ink-3);font-style:italic}
 .pdf-print .note{display:none}
 .pdf-print #addMachine{display:none !important}
 .pdf-print .scale, .pdf-print .scale .fill, .pdf-print .scale .zone, .pdf-print .scale .limit, .pdf-print .spec, .pdf-print .card > h2, .pdf-print .mhead, .pdf-print .common > h4, .pdf-print .chk input:checked, .pdf-print .finding .sev, .pdf-print .verdict{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+/* blocs vides : ils n'apportent rien au rapport et ajoutaient jusqu'à une
+   page blanche en fin de document */
+html.pdf-print, .pdf-print body{margin:0;padding:0;height:auto}
+.pdf-print main{padding:0;margin:0}
+.pdf-print #printBlock:empty, .pdf-print .card-body:empty, .pdf-print .f .msg:empty,
+.pdf-print section[role="tabpanel"]:empty, .pdf-print #machineList:empty{display:none !important}
+.pdf-print main > section:last-child{margin-bottom:0}
+.pdf-print .card:last-child{margin-bottom:0}
 
 .mailbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .mailmsg{font-family:var(--cond);font-size:12px;letter-spacing:.03em;color:var(--ink-2)}
@@ -859,20 +875,30 @@ async function genererPdfBlob(echelle){
   renderMachines(analyse());
   marqueVides();
   document.documentElement.classList.add('pdf-print');
+  /* html2canvas positionne la zone capturée à partir du défilement courant :
+     si la page est défilue au moment du clic (le bouton est en bas de l'étape
+     Rapport), la capture démarre trop bas et le PDF commence par une demi-page
+     blanche. On remonte donc en haut avant la capture, puis on restaure. */
+  const yAvant = window.pageYOffset || 0;
+  window.scrollTo(0, 0);
   const restaurerStyles = activerFiltreStyles();
   try {
     const opt = {
-      margin: 9,
+      margin: 8,
       filename: `checklist_${slug()}.pdf`,
       image: { type:'jpeg', quality:0.92 },
-      html2canvas: { scale: echelle || 2, useCORS:true, backgroundColor:'#ffffff', logging:false },
+      html2canvas: { scale: echelle || 2, useCORS:true, backgroundColor:'#ffffff', logging:false, scrollX:0, scrollY:0 },
       jsPDF: { unit:'mm', format:'a4', orientation:'portrait', compress:true },
-      pagebreak: { mode:['css','legacy'], avoid:['.card','.mrow','.common','.checks'] }
+      /* on ne protège plus que les petits blocs : interdire la coupure des
+         cartes entières faisait basculer chaque carte sur la page suivante et
+         laissait la moitié de chaque feuille vide. */
+      pagebreak: { mode:['css','legacy'], avoid:['.chk','.finding','.f','.gauge','.mhead','.ghead'] }
     };
     return await html2pdf().set(opt).from($('main')).outputPdf('blob');
   } finally {
     restaurerStyles();
     document.documentElement.classList.remove('pdf-print');
+    window.scrollTo(0, yAvant);
   }
 }
 
