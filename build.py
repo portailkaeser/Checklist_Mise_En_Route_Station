@@ -11,6 +11,12 @@ OUT.parent.mkdir(parents=True, exist_ok=True)
 
 html = SRC.read_text(encoding='utf-8')
 
+# ------------------------------------------------- destinataire du support
+OLD_MAIL = "destinataire: 'hay.leang@kaeser.com',"
+NEW_MAIL = "destinataire: 'supporttechnique.france@kaeser.com',"
+assert OLD_MAIL in html, "adresse destinataire introuvable"
+html = html.replace(OLD_MAIL, NEW_MAIL, 1)
+
 # ---------------------------------------------------------------- polices
 FONTS = [
     ("IBM Plex Sans", 'ibm-plex-sans', [400, 500, 600]),
