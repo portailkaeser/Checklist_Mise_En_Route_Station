@@ -10,7 +10,7 @@
    Après chaque mise à jour d'index.html, incrémentez le numéro de version
    ci-dessous, sinon les appareils continueront de servir l'ancienne copie.
    ========================================================================= */
-const CACHE = 'mise-en-route-v1';
+const CACHE = 'mise-en-route-v2';
 const ACTIFS = ['./', './index.html', './manifest.webmanifest'];
 
 self.addEventListener('install', e => {
