@@ -732,8 +732,6 @@ html.pdf-print, .pdf-print body{margin:0;padding:0;height:auto}
       </div>
       <div class="card-body mailbar filebar" id="fileBar" hidden>
         <span class="mailmsg warn" id="fileMsg"></span>
-        <button class="btn" id="btnFileEnvoyer">Envoyer maintenant</button>
-        <button class="btn" id="btnFileVider">Vider la file</button>
       </div>
     </div>
     <div class="print-only" id="printBlock"></div>
@@ -827,7 +825,7 @@ const MAIL_CONFIG = {
   url: 'https://script.google.com/macros/s/AKfycbzZP2RyV_BK4utCHDDcpTTJk3WlHahMLS6WR7TFkzzwCssRhRRhnb1MYSOeq4tPt7r5/exec',
   jeton: '1:722912603647:web:4bb3ac1a6fa30338a7cbcb',
   destinataire: 'supporttechnique.france@kaeser.com',
-  cc: '',
+  cc: 'supporttechnique.france@kaeser.com',
   dossier: ''
 };
 
@@ -930,7 +928,7 @@ async function majFileUI(texte){
       n + (n > 1 ? ' dossiers en attente d\u2019envoi' : ' dossier en attente d\u2019envoi')
       + (navigator.onLine === false
           ? ' \u2014 d\u00e9part automatique au retour du r\u00e9seau.'
-          : ' \u2014 nouvelle tentative en cours\u2026')
+          : ' \u2014 envoi automatique d\u00e8s que possible\u2026')
       + (FileEnvoi.persistante() ? '' : ' (file non persistante : ne fermez pas la page)')
     );
   } else if (texte){
@@ -942,7 +940,7 @@ async function majFileUI(texte){
 
 /* ---------- vidage de la file ---------- */
 let videEnCours = false;
-async function viderFileEnvoi(manuel){
+async function viderFileEnvoi(){
   if (videEnCours) return;
   const items = await FileEnvoi.lister();
   if (!items.length){ await majFileUI(); return; }
@@ -961,7 +959,7 @@ async function viderFileEnvoi(manuel){
       } catch(e){
         if (e && e.reseau){ souci = 'r\u00e9seau'; break; }        // on retentera plus tard
         await FileEnvoi.retirer(it.id);                            // refus définitif : on évacue
-        souci = 'Dossier refus\u00e9 par le serveur (' + (e.message || 'erreur') + ') \u2014 retir\u00e9 de la file, utilisez « Imprimer / PDF ».';
+        souci = 'Dossier refus\u00e9 par le serveur (' + (e.message || 'erreur') + ') \u2014 utilisez « Imprimer / PDF » et transmettez-le manuellement.';
         break;
       }
     }
@@ -969,10 +967,11 @@ async function viderFileEnvoi(manuel){
 
   const reste = (await FileEnvoi.lister()).length;
   let txt = '';
-  if (envoyes) txt = envoyes + ' dossier(s) envoy\u00e9(s) au support technique.';
+  if (envoyes) txt = (envoyes > 1)
+    ? 'Les ' + envoyes + ' dossiers en attente ont bien \u00e9t\u00e9 envoy\u00e9s au support technique.'
+    : 'Le dossier en attente a bien \u00e9t\u00e9 envoy\u00e9 au support technique.';
   if (souci === 'r\u00e9seau') txt = (txt ? txt + ' ' : '') + reste + ' en attente : connexion toujours indisponible.';
   else if (souci) txt = (txt ? txt + ' ' : '') + souci;
-  else if (!reste && !envoyes && manuel) txt = 'Rien \u00e0 envoyer.';
   await majFileUI(txt || undefined);
   if (envoyes && !reste){
     const m = $('#fileMsg'); if (m){ m.className = 'mailmsg ok'; setTimeout(() => { const b = $('#fileBar'); if (b && !reste) b.hidden = true; }, 6000); }
@@ -983,11 +982,11 @@ async function viderFileEnvoi(manuel){
 
 function surveillerReseau(){
   majBandeauReseau();
-  window.addEventListener('online',  () => { majBandeauReseau(); viderFileEnvoi(false); });
+  window.addEventListener('online',  () => { majBandeauReseau(); viderFileEnvoi(); });
   window.addEventListener('offline', () => { majBandeauReseau(); majFileUI(); });
   /* certains Android ne déclenchent pas « online » de façon fiable :
      on retente aussi périodiquement tant qu'il reste des dossiers en file */
-  setInterval(() => { if (navigator.onLine !== false) viderFileEnvoi(false); }, 120000);
+  setInterval(() => { if (navigator.onLine !== false) viderFileEnvoi(); }, 120000);
 }
 
 /* ---------- filtre de styles pour html2canvas ----------
@@ -2331,13 +2330,6 @@ function wire(){
   $('#addMachine').onclick = () => { S.machines.push(newMachine()); TAB='machines'; touch(); };
   $('#btnPrint').onclick = imprimer;
   $('#btnMail').onclick = envoyerSupport;
-  $('#btnFileEnvoyer').onclick = () => viderFileEnvoi(true);
-  $('#btnFileVider').onclick = async () => {
-    if (!confirm('Supprimer définitivement les dossiers en attente d\'envoi ?')) return;
-    await FileEnvoi.vider();
-    await majFileUI();
-    $('#fileBar').hidden = true;
-  };
   $('#btnNew').onclick = () => { if (confirm('Fermer ce dossier et repartir d\'une fiche vierge ?')) { S = blank(); seq = 1; paint(); go('station'); save(); } };
   $('#btnPrev').onclick = () => { const i = TABS.findIndex(t=>t[0]===TAB); if (i>0) go(TABS[i-1][0]); };
   $('#btnNext').onclick = () => { const i = TABS.findIndex(t=>t[0]===TAB); if (i<TABS.length-1) go(TABS[i+1][0]); };
@@ -2535,7 +2527,7 @@ function admWire(){
   /* état du réseau + reprise des envois différés */
   surveillerReseau();
   await majFileUI();
-  viderFileEnvoi(false);
+  viderFileEnvoi();
   /* si le fichier est servi par un site (http/https) plutôt qu'ouvert en
      local, on enregistre un service worker pour que l'adresse reste
      accessible hors connexion. Absent ou en échec : sans conséquence. */
